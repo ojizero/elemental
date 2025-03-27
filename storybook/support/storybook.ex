@@ -4,7 +4,6 @@ defmodule Elemental.Storybook do
     title: "Elemental Storybook",
     content_path: Path.expand("../", __DIR__),
     css_path: "/elementals/assets/app.css",
-    sandbox_class: "elemental-storybook-sandbox",
     themes: [
       default: [name: "Default"],
       colorful: [name: "Colorful", dropdown_class: "psb-text-pink-600"]

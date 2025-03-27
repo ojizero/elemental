@@ -29,7 +29,7 @@ defmodule Elemental.MixProject do
       {:phoenix_storybook, "~> 0.8"},
       {:phoenix_playground, "~> 0.1.6"},
       {:phoenix_html_helpers, "~> 1.0"},
-      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev}
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev}
     ]
   end
 
