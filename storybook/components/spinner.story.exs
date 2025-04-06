@@ -6,7 +6,7 @@ defmodule Elemental.Storybook.Components.Spinner do
   def variations do
     [
       %Variation{
-        id: :default_badge,
+        id: :spinner,
         attributes: %{}
       }
     ]

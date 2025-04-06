@@ -8,9 +8,8 @@ defmodule Elemental.Storybook.MyPage do
   # Declare an optional tab-based navigation in your page:
   def navigation do
     [
-      {:welcome, "Welcome", {:fa, "hand-wave", :thin}}
-      # {:components, "Components", {:fa, "toolbox", :thin}},
-      # {:sandboxing, "Sandboxing", {:fa, "box-check", :thin}},
+      {:welcome, "Welcome", {:fa, "hand-wave", :thin}},
+      {:components, "Components", {:fa, "toolbox", :thin}}
       # {:icons, "Icons", {:fa, "icons", :thin}}
     ]
   end

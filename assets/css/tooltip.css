@@ -1,0 +1,138 @@
+/**
+ * This work is derived from Thoughtlessmind's css-only-tooltip NPM package.
+ *
+ * Copyright (c) 2021 Rajiv
+ *
+ * Ref: https://github.com/thoughtlessmind/css-only-tooltip/tree/114118b416fd3c9621be090a02f797a969446a10
+ */
+
+[tooltip] {
+  cursor: pointer;
+  position: relative;
+}
+
+[tooltip]::after {
+  content: attr(tooltip);
+
+  /* Main properties */
+  z-index: 200;
+  font-family: "Roboto", sans-serif;
+  font-weight: normal;
+  font-size: 14px;
+  padding: 8px 12px;
+  height: fit-content;
+  width: fit-content;
+  white-space: nowrap;
+  border-radius: 6px;
+  position: absolute;
+  text-align: center;
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+
+  /* Default theme */
+  color: #222;
+  background-color: #fff;
+
+  /* Default positioning */
+  top: 0;
+  left: 50%;
+  right: 50%;
+  transform: translate(-50%, -100%) scale(0);
+  transform-origin: bottom;
+  transition: transform 0.14s;
+}
+
+[tooltip]:hover:after {
+  display: block;
+  transform: translate(-50%, -120%) scale(1);
+}
+
+/* -------------------------------------------------------------- */
+/*  ----------------------- THEMES ----------------------------- */
+
+/* ----- Based on user theme ----- */
+@media (prefers-color-scheme: dark) {
+  [tooltip]::after {
+    background-color: #222;
+    color: #fff;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  [tooltip]::after {
+    background-color: #fff;
+    color: #222;
+  }
+}
+
+/* ----- Dark -----*/
+[tooltip-props~="dark"]::after {
+  background-color: #222;
+  color: #fff;
+}
+
+/* ----- Light -----*/
+[tooltip-props~="light"]::after {
+  background-color: #fff;
+  color: #222;
+}
+
+
+/* -------------------------------------------------------------- */
+/*  ----------------------- POSITIONS ----------------------------- */
+
+/* ----- Right -----*/
+[tooltip-props~="right"]::after {
+  transform: translate(0%, 30%) scale(0);
+  right: 0%;
+  left: 100%;
+  top: unset;
+  bottom: 0;
+  transform-origin: left;
+}
+
+[tooltip-props~="right"]:hover:after {
+  transform: translate(10%, 30%) scale(1);
+}
+
+/* ----- Left ------*/
+[tooltip-props~="left"]::after {
+  transform: translate(-100%, 30%) scale(0);
+  transform-origin: right;
+  right: 100%;
+  left: 0;
+  top: unset;
+  bottom: 0;
+}
+
+[tooltip-props~="left"]:hover:after {
+  transform: translate(-110%, 30%) scale(1);
+  transform-origin: right;
+}
+
+/* ----- Top -----*/
+[tooltip-props~="top"]::after {
+  transform: translate(-50%, -100%) scale(0);
+  transform-origin: bottom;
+  right: 50%;
+  left: 50%;
+  top: 0;
+  bottom: unset;
+}
+
+[tooltip-props~="top"]:hover:after {
+  transform: translate(-50%, -120%) scale(1);
+}
+
+/* ----- Bottom -----*/
+[tooltip-props~="bottom"]::after {
+  transform: translate(-50%, 110%) scale(0);
+  transform-origin: top;
+  right: 50%;
+  left: 50%;
+  bottom: 0;
+  top: unset;
+}
+
+[tooltip-props~="bottom"]:hover:after {
+  transform: translate(-50%, 120%) scale(1);
+}
