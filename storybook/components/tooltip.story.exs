@@ -1,6 +1,5 @@
 defmodule Elemental.Storybook.Components.Tooltip do
   use PhoenixStorybook.Story, :component
-  use Phoenix.Component
 
   def function, do: &Elemental.Tooltip.tooltip/1
 
