@@ -66,14 +66,4 @@ defmodule Elemental.Table do
     </tbody>
     """
   end
-
-  defp prepend_class(assigns, class) do
-    assigns
-    |> assign_new(:rest, fn -> %{} end)
-    |> update(:rest, fn
-      %{class: classes} = rest when is_list(classes) -> %{rest | class: [class, classes]}
-      %{class: classes} = rest when is_binary(classes) -> %{rest | class: "#{class} #{classes}"}
-      rest -> Map.put(rest, :class, class)
-    end)
-  end
 end
