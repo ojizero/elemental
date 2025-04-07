@@ -3,7 +3,7 @@ defmodule Elemental.Storybook.MyPage do
   # documentation.
   use PhoenixStorybook.Story, :page
 
-  def doc, do: "Your very first steps into using Phoenix Storybook"
+  def doc, do: "Yet another Tailwind/Daisy based Phoenix components."
 
   # Declare an optional tab-based navigation in your page:
   def navigation do

@@ -1,7 +1,7 @@
 import Config
 
 config :tailwind,
-  version: "4.0.9",
+  version: "4.1.0",
   elemental: [
     args: ~w(
       --input=assets/css/app.css
