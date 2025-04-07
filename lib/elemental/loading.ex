@@ -1,4 +1,6 @@
 defmodule Elemental.Loading do
+  @moduledoc "> Exposing Daisy loaders as Phoenix components."
+
   use Elemental.Component
 
   @daisy_loading_components ~w(spinner dots ring ball bars infinity)

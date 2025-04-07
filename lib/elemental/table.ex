@@ -1,7 +1,5 @@
 defmodule Elemental.Table do
-  @moduledoc """
-  > Tabular data display components.
-  """
+  @moduledoc "> Tabular data display components."
 
   use Elemental.Component
 
