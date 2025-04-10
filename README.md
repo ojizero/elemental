@@ -2,19 +2,13 @@
 
 > A Tailwind and DaisyUI based Phoenix components library.
 
-## Installation
+### Note
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `elemental` to your list of dependencies in `mix.exs`:
+As it is right now this is mostly an experimental playground for myself
+and intended to explore frontend patterns as a person only a passing
+experience in frontend and a higher preference for backend stuff.
 
-```elixir
-def deps do
-  [
-    {:elemental, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/elemental>.
+This as such currently mainly acts an experimental playground, in addition
+to me exploring stuff on the side on my own time as well as having a
+super minimal side project when I wanna play around with arbitrary
+frontend components.
