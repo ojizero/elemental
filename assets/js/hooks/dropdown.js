@@ -52,16 +52,32 @@ export const ElementalDropdownSearch = {
 
 /**
  * Allows for updating the dropdown prompt with the selected value
- * from the options. Intended for internal use only.
+ * from the options, additionally closes the dropdown by
+ * removing focus. Intended for internal use only.
  */
 export const ElementalDropdownSingleItem = {
   mounted() {
-    const label = this.el.getAttribute('elemental-hook-label')
-    const promptId = this.el.getAttribute('elemental-hook-prompt-id')
-    const promptEl = document.getElementById(promptId)
     // This is simple but does the trick since it is intended to work
     // with radio buttons, i.e. click implies selection.
-    this.el.onclick = () => promptEl.innerText = label
+    this.el.onclick = () => {
+      this.closeDropdown()
+      this.updatePrompt()
+    }
+  },
+
+  updatePrompt() {
+    const label = this.el.getAttribute("elemental-hook-label")
+    const promptId = this.el.getAttribute("elemental-hook-prompt-id")
+    const promptEl = document.getElementById(promptId)
+    promptEl.innerText = label
+  },
+
+  // Close the prompt by removing focus from it, this is based
+  // on how the dropdown is implemented.
+  closeDropdown() {
+    const contentId = this.el.getAttribute("elemental-hook-content-id")
+    const contentEl = document.getElementById(contentId)
+    contentEl.blur()
   }
 }
 
@@ -72,8 +88,8 @@ export const ElementalDropdownSingleItem = {
 export const ElementalDropdownMultiItem = {
   mounted() {
     console.error("not implemented")
-    // const label = this.el.getAttribute('elemental-hook-label')
-    // const promptId = this.el.getAttribute('elemental-hook-prompt-id')
+    // const label = this.el.getAttribute("elemental-hook-label")
+    // const promptId = this.el.getAttribute("elemental-hook-prompt-id")
     // const promptEl = document.getElementById(promptId)
   }
 }

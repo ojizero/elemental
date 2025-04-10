@@ -135,6 +135,7 @@ defmodule Elemental.Dropdown do
           value={value}
           multi={@multi}
           prompt_element_id={@name <> "__prompt"}
+          content_element_id={@name <> "__content"}
         />
       </ul>
     </div>
@@ -145,8 +146,9 @@ defmodule Elemental.Dropdown do
   attr :name, :string, required: true
   attr :label, :string, required: true
   attr :value, :string, required: true
-  attr :prompt_element_id, :string, required: true
   attr :multi, :boolean, required: true
+  attr :prompt_element_id, :string, required: true
+  attr :content_element_id, :string, required: true
 
   defp dropdown_item(assigns) do
     ~H"""
@@ -160,6 +162,7 @@ defmodule Elemental.Dropdown do
           class={item_class(assigns)}
           elemental-hook-label={@label}
           elemental-hook-prompt-id={@prompt_element_id}
+          elemental-hook-content-id={@content_element_id}
           phx-hook={not @multi && "ElementalDropdownSingleItem"}
         />
         {@label}
