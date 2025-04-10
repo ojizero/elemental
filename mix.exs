@@ -25,9 +25,10 @@ defmodule Elemental.MixProject do
   defp package do
     %{
       name: :elemental,
-      licenses: ["MIT"],
       files: ~w(mix.exs package.json lib priv LICENCE README.md),
-      links: %{"GitHub" => "https://github.com/ojizero/elemental"}
+      links: %{"GitHub" => "https://github.com/ojizero/elemental"},
+      licenses: ["MIT"],
+      exclude_patterns: ~w(storybook*)
     }
   end
 
