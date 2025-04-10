@@ -14,6 +14,25 @@ defmodule Elemental.Storybook.Components.Dropdown do
       %Variation{
         id: :multi_select,
         attributes: %{prompt: "Dropdown", options: @options, multi: true}
+      },
+      %Variation{
+        id: :single_select_with_preselection,
+        attributes: %{
+          prompt: "Dropdown",
+          options: @options,
+          multi: false,
+          # Can be a single item as well
+          value: ["Baz Value"]
+        }
+      },
+      %Variation{
+        id: :multi_select_with_preselection,
+        attributes: %{
+          prompt: "Dropdown",
+          options: @options,
+          multi: true,
+          value: ["Foo", "Baz Value"]
+        }
       }
     ]
   end
