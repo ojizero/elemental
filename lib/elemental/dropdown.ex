@@ -240,11 +240,11 @@ defmodule Elemental.Dropdown do
 
   defp dropdown_prompt(assigns) do
     ~H"""
-    <span id={@name <> "__default_prompt"}>{@prompt}</span>
+    <span id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>{@prompt}</span>
     <span
-      :for={{{label, _value}, index} <- Enum.with_index(@options)}
+      :for={{{label, value}, index} <- Enum.with_index(@options)}
       id={@name <> "__item_#{index}_display"}
-      class={["hidden", @multi && "badge badge-neutral"]}
+      class={[@multi && "badge badge-neutral", value not in @value && "hidden"]}
     >
       {label}
     </span>
