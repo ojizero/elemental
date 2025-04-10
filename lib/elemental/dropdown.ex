@@ -156,7 +156,7 @@ defmodule Elemental.Dropdown do
       <label>
         <input
           id={@id}
-          name={@name}
+          name={item_name(assigns)}
           value={@value}
           type={item_type(assigns)}
           class={item_class(assigns)}
@@ -189,6 +189,9 @@ defmodule Elemental.Dropdown do
       label when is_binary(label) -> {label, label}
     end)
   end
+
+  defp item_name(%{multi: true, name: name}), do: "#{name}[]"
+  defp item_name(%{multi: false, name: name}), do: "name"
 
   defp item_type(%{multi: true}), do: "checkbox"
   defp item_type(%{multi: false}), do: "radio"
