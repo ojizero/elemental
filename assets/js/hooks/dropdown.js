@@ -66,10 +66,26 @@ export const ElementalDropdownSingleItem = {
   },
 
   updatePrompt() {
-    const label = this.el.getAttribute("elemental-hook-label")
-    const promptId = this.el.getAttribute("elemental-hook-prompt-id")
+    this.hideAllPrompts()
+    this.showSelectedPrompt()
+  },
+
+  hideAllPrompts() {
+    const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
     const promptEl = document.getElementById(promptId)
-    promptEl.innerText = label
+    console.log(promptEl)
+    Array.from(promptEl.children).forEach((child) => {
+      console.log({ id: child.id, classList: child.classList })
+      const classList = child.classList
+      if (!classList.contains("hidden")) {
+        classList.add("hidden")
+      }
+    })
+  },
+
+  showSelectedPrompt() {
+    const displayId = `${this.el.id}_display`
+    document.getElementById(displayId).classList.remove("hidden")
   },
 
   // Close the prompt by removing focus from it, this is based
@@ -87,9 +103,22 @@ export const ElementalDropdownSingleItem = {
  */
 export const ElementalDropdownMultiItem = {
   mounted() {
-    console.error("not implemented")
-    // const label = this.el.getAttribute("elemental-hook-label")
-    // const promptId = this.el.getAttribute("elemental-hook-prompt-id")
-    // const promptEl = document.getElementById(promptId)
+    this.el.onclick = () => {
+      this.hideDefaultPrompt()
+      this.toggleSelf()
+    }
+  },
+
+  hideDefaultPrompt() {
+    const promptId = this.el.getAttribute("elemental-hook--default-prompt-id")
+    const promptEl = document.getElementById(promptId)
+    if (!promptEl.classList.contains("hidden")) {
+      promptEl.classList.add("hidden")
+    }
+  },
+
+  toggleSelf() {
+    const displayId = `${this.el.id}_display`
+    document.getElementById(displayId).classList.toggle("hidden")
   }
 }

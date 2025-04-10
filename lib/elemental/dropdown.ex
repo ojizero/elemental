@@ -57,7 +57,7 @@ defmodule Elemental.Dropdown do
        doc: """
        A value that is selected currently by the component.
 
-       Useful for either preselecting items to maintaining selected
+       Useful for either preselecting items or to maintaining selected
        items state across rerenders.
 
        ### Type
@@ -114,7 +114,29 @@ defmodule Elemental.Dropdown do
   attr :class,
        :string,
        default: nil,
-       doc: "Additional CSS classes to pass to the dropdown container."
+       doc: """
+       Additional CSS classes to pass to the dropdown.
+
+       Those will be applied to the the dropdown prompt container since it's
+       the "visible"/"interactive" bit of the dropdown.
+       """
+
+  #  TODO: implement this to allow for configuring the display of the badges for multi mode
+  #  TODO: implement abstraction to allow user to call on a cancel button to deselect an item here
+  # slot :selected_badge,
+  #   doc: """
+  #   A slot declaring how to render the prompt value. The default value would
+  #   render the items inside a simple span as badges.
+
+  #   ### Notes
+
+  #   - This will not be called for the default prompt value.
+  #   - This will be called only once with single selection mode.
+  #   - This will be called multiple times, one after the other, in
+  #     multiple selection mode for each selected value.
+  #   - The items in multiple selection mode will be wrapped in a flex
+  #     with wrap on overflow.
+  #   """
 
   @doc """
   The primary dropdown component.
@@ -130,12 +152,22 @@ defmodule Elemental.Dropdown do
         "dropdown-#{@align}",
         "dropdown-#{@from}",
         @hover && "dropdown-hover",
-        @open && "dropdown-open",
-        @class
+        @open && "dropdown-open"
       ]}
     >
-      <div id={@name <> "__prompt"} tabindex="0" role="button" class="select m-1">
-        {prompt_initial_value(assigns)}
+      <div
+        id={@name <> "__prompt_container"}
+        tabindex="0"
+        role="button"
+        class={["select m-1 overflow-scroll gap-1", @class]}
+      >
+        <.dropdown_prompt
+          name={@name}
+          value={@value}
+          multi={@multi}
+          prompt={@prompt}
+          options={@options}
+        />
       </div>
       <ul
         id={@name <> "__content"}
@@ -159,8 +191,9 @@ defmodule Elemental.Dropdown do
           value={value}
           multi={@multi}
           selected={value in @value}
-          prompt_element_id={@name <> "__prompt"}
           content_element_id={@name <> "__content"}
+          default_prompt_element_id={@name <> "__default_prompt"}
+          prompt_container_element_id={@name <> "__prompt_container"}
         />
       </ul>
     </div>
@@ -173,8 +206,9 @@ defmodule Elemental.Dropdown do
   attr :value, :string, required: true
   attr :multi, :boolean, required: true
   attr :selected, :boolean, required: true
-  attr :prompt_element_id, :string, required: true
   attr :content_element_id, :string, required: true
+  attr :default_prompt_element_id, :string, required: true
+  attr :prompt_container_element_id, :string, required: true
 
   defp dropdown_item(assigns) do
     ~H"""
@@ -186,15 +220,34 @@ defmodule Elemental.Dropdown do
           value={@value}
           type={item_type(assigns)}
           class={item_class(assigns)}
-          elemental-hook-label={@label}
-          elemental-hook-prompt-id={@prompt_element_id}
           elemental-hook-content-id={@content_element_id}
-          phx-hook={not @multi && "ElementalDropdownSingleItem"}
+          elemental-hook--default-prompt-id={@default_prompt_element_id}
+          elemental-hook-prompt-container-id={@prompt_container_element_id}
+          phx-hook={if @multi, do: "ElementalDropdownMultiItem", else: "ElementalDropdownSingleItem"}
           checked={@selected}
         />
         {@label}
       </label>
     </li>
+    """
+  end
+
+  attr :name, :string, required: true
+  attr :value, :list, required: true
+  attr :multi, :boolean, required: true
+  attr :prompt, :string, required: true
+  attr :options, :list, required: true
+
+  defp dropdown_prompt(assigns) do
+    ~H"""
+    <span id={@name <> "__default_prompt"}>{@prompt}</span>
+    <span
+      :for={{{label, _value}, index} <- Enum.with_index(@options)}
+      id={@name <> "__item_#{index}_display"}
+      class={["hidden", @multi && "badge badge-neutral"]}
+    >
+      {label}
+    </span>
     """
   end
 
@@ -228,22 +281,6 @@ defmodule Elemental.Dropdown do
       values, %{multi: true} when is_list(values) -> values
     end)
   end
-
-  # TODO: currently only supports single select mode since we
-  # only support changing prompt in this mode
-  defp prompt_initial_value(%{
-         multi: false,
-         value: [value],
-         prompt: prompt,
-         options: options
-       }) do
-    Enum.find_value(options, prompt, fn
-      {label, ^value} -> label
-      _otherwise -> false
-    end)
-  end
-
-  defp prompt_initial_value(%{prompt: prompt}), do: prompt
 
   defp item_name(%{multi: true, name: name}), do: "#{name}[]"
   defp item_name(%{multi: false, name: name}), do: name
