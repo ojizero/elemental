@@ -200,6 +200,25 @@ defmodule Elemental.Dropdown do
     """
   end
 
+  attr :name, :string, required: true
+  attr :value, :list, required: true
+  attr :multi, :boolean, required: true
+  attr :prompt, :string, required: true
+  attr :options, :list, required: true
+
+  defp dropdown_prompt(assigns) do
+    ~H"""
+    <span id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>{@prompt}</span>
+    <span
+      :for={{{label, value}, index} <- Enum.with_index(@options)}
+      id={@name <> "__item_#{index}_display"}
+      class={[@multi && "badge badge-neutral", value not in @value && "hidden"]}
+    >
+      {label}
+    </span>
+    """
+  end
+
   attr :id, :string, required: true
   attr :name, :string, required: true
   attr :label, :string, required: true
@@ -229,25 +248,6 @@ defmodule Elemental.Dropdown do
         {@label}
       </label>
     </li>
-    """
-  end
-
-  attr :name, :string, required: true
-  attr :value, :list, required: true
-  attr :multi, :boolean, required: true
-  attr :prompt, :string, required: true
-  attr :options, :list, required: true
-
-  defp dropdown_prompt(assigns) do
-    ~H"""
-    <span id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>{@prompt}</span>
-    <span
-      :for={{{label, value}, index} <- Enum.with_index(@options)}
-      id={@name <> "__item_#{index}_display"}
-      class={[@multi && "badge badge-neutral", value not in @value && "hidden"]}
-    >
-      {label}
-    </span>
     """
   end
 
