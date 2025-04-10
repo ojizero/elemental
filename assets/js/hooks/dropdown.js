@@ -57,7 +57,7 @@ export const ElementalDropdownSearch = {
 export const ElementalDropdownSingleItem = {
   mounted() {
     const label = this.el.getAttribute('elemental-hook-label')
-    const promptId = this.el.getAttribute('elemental-hook-target-id')
+    const promptId = this.el.getAttribute('elemental-hook-prompt-id')
     const promptEl = document.getElementById(promptId)
     // This is simple but does the trick since it is intended to work
     // with radio buttons, i.e. click implies selection.
@@ -73,7 +73,7 @@ export const ElementalDropdownMultiItem = {
   mounted() {
     console.error("not implemented")
     // const label = this.el.getAttribute('elemental-hook-label')
-    // const promptId = this.el.getAttribute('elemental-hook-target-id')
+    // const promptId = this.el.getAttribute('elemental-hook-prompt-id')
     // const promptEl = document.getElementById(promptId)
   }
 }

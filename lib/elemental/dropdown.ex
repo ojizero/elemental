@@ -1,4 +1,22 @@
 defmodule Elemental.Dropdown do
+  @moduledoc """
+  > An abstraction around DaisyUI's dropdown.
+
+  Think of it as a more advanced `Elemental.Select` with support for
+  multi-select and searching out of the box.
+
+  This is implement in a manner that works drop in in forms and uses
+  only dead/stateless components with minimal JavaScript.
+
+  ## Usage
+
+  Most basic usage is done by simply passing it `options`
+
+     <.dropdown options={["Foo", "Bar"]}/>
+
+  See `dropdown/1` for details on the support properties and their behaviour.
+  """
+
   use Elemental.Component
 
   attr :options,
@@ -80,6 +98,9 @@ defmodule Elemental.Dropdown do
        default: nil,
        doc: "Additional CSS classes to pass to the dropdown container."
 
+  @doc """
+  The primary dropdown component.
+  """
   def dropdown(assigns) do
     assigns = normalize_assigns(assigns)
 
@@ -106,87 +127,54 @@ defmodule Elemental.Dropdown do
           placeholder="Search"
           phx-hook="ElementalDropdownSearch"
         />
-        <li
+        <.dropdown_item
           :for={{{label, value}, index} <- Enum.with_index(@options)}
-          id={label}
-          elemental-label={label}
-          elemental-item-id={@name <> "__item_#{index}"}
-        >
-          <.dropdown_item
-            id={@name <> "__item_#{index}"}
-            name={@name}
-            label={label}
-            value={value}
-            multi={@multi}
-            hook_target_id={@name <> "__prompt"}
-          />
-        </li>
+          id={@name <> "__item_#{index}"}
+          name={@name}
+          label={label}
+          value={value}
+          multi={@multi}
+          hook_target_id={@name <> "__prompt"}
+        />
       </ul>
     </div>
     """
   end
 
-  attr :id,
-       :string,
-       required: true,
-       doc: ""
+  attr :id, :string, required: true
+  attr :name, :string, required: true
+  attr :label, :string, required: true
+  attr :value, :string, required: true
+  attr :hook_target_id, :string, required: true
+  attr :multi, :boolean, required: true
 
-  attr :name,
-       :string,
-       required: true,
-       doc: ""
-
-  attr :multi,
-       :boolean,
-       default: false,
-       doc: ""
-
-  attr :label,
-       :string,
-       required: true,
-       doc: ""
-
-  attr :value,
-       :string,
-       required: true,
-       doc: ""
-
-  attr :hook_target_id,
-       :string,
-       required: true,
-       doc: ""
-
-  defp dropdown_item(%{multi: false} = assigns) do
+  defp dropdown_item(assigns) do
     ~H"""
-    <label>
-      <input
-        id={@id}
-        name={@name}
-        type="radio"
-        class="checkbox"
-        value={@value}
-        elemental-hook-target-id={@hook_target_id}
-        elemental-hook-label={@label}
-        phx-hook="ElementalDropdownSingleItem"
-      />
-      {@label}
-    </label>
-    """
-  end
-
-  defp dropdown_item(%{multi: true} = assigns) do
-    ~H"""
-    <label>
-      <input
-        id={@id}
-        name={@name <> "[]"}
-        type="checkbox"
-        class="checkbox"
-        value={@value}
-        elemental-hook-target-id={@hook_target_id}
-      />
-      {@label}
-    </label>
+    <li elemental-label={@label} elemental-item-id={@id}>
+      <label>
+        <input
+          id={@id}
+          name={@name}
+          type={
+            cond do
+              @multi -> "checkbox"
+              not @multi -> "radio"
+            end
+          }
+          class={
+            cond do
+              @multi -> "checkbox"
+              not @multi -> "hidden"
+            end
+          }
+          value={@value}
+          elemental-hook-label={@label}
+          elemental-hook-prompt-id={@hook_target_id}
+          phx-hook={not @multi && "ElementalDropdownSingleItem"}
+        />
+        {@label}
+      </label>
+    </li>
     """
   end
 
