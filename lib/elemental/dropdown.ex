@@ -191,7 +191,7 @@ defmodule Elemental.Dropdown do
   end
 
   defp item_name(%{multi: true, name: name}), do: "#{name}[]"
-  defp item_name(%{multi: false, name: name}), do: "name"
+  defp item_name(%{multi: false, name: name}), do: name
 
   defp item_type(%{multi: true}), do: "checkbox"
   defp item_type(%{multi: false}), do: "radio"
