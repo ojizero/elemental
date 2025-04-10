@@ -3,19 +3,9 @@ defmodule Elemental.Storybook.MyPage do
   # documentation.
   use PhoenixStorybook.Story, :page
 
-  def doc, do: "Yet another Tailwind/Daisy based Phoenix components."
+  def doc, do: "A Tailwind and DaisyUI based Phoenix components library."
 
-  # Declare an optional tab-based navigation in your page:
-  def navigation do
-    [
-      {:welcome, "Welcome", {:fa, "hand-wave", :thin}},
-      {:components, "Components", {:fa, "toolbox", :thin}}
-      # {:icons, "Icons", {:fa, "icons", :thin}}
-    ]
-  end
-
-  # This is a dummy fonction that you should replace with your own HEEx content.
-  def render(assigns = %{tab: :welcome}) do
+  def render(assigns) do
     ~H"""
     <div class="psb-welcome-page">
       <p>
