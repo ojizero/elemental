@@ -51,6 +51,24 @@ defmodule Elemental.Dropdown do
        required: false,
        doc: "The name of the dropdown, if not given a random value is selected."
 
+  attr :value,
+       :any,
+       default: nil,
+       doc: """
+       A value that is selected currently by the component.
+
+       Useful for either preselecting items to maintaining selected
+       items state across rerenders.
+
+       ### Type
+
+       - The type is required to either be a single string or a list of strings,
+         the values of it should correspond to the value (not label) of the
+         options (if using a list of strings then it's the same as label).
+       - If the type is single select and if the value is a list of more than one
+         item this will raise an error.
+       """
+
   attr :multi,
        :boolean,
        default: false,
@@ -105,15 +123,20 @@ defmodule Elemental.Dropdown do
     assigns = normalize_assigns(assigns)
 
     ~H"""
-    <div class={[
-      "dropdown",
-      "dropdown-#{@align}",
-      "dropdown-#{@from}",
-      @hover && "dropdown-hover",
-      @open && "dropdown-open",
-      @class
-    ]}>
-      <div id={@name <> "__prompt"} tabindex="0" role="button" class="select m-1">{@prompt}</div>
+    <div
+      id={@name <> "__container"}
+      class={[
+        "dropdown",
+        "dropdown-#{@align}",
+        "dropdown-#{@from}",
+        @hover && "dropdown-hover",
+        @open && "dropdown-open",
+        @class
+      ]}
+    >
+      <div id={@name <> "__prompt"} tabindex="0" role="button" class="select m-1">
+        {prompt_initial_value(assigns)}
+      </div>
       <ul
         id={@name <> "__content"}
         tabindex="0"
@@ -121,7 +144,8 @@ defmodule Elemental.Dropdown do
       >
         <input
           :if={@searchable}
-          id={random()}
+          id={@name <> "__search"}
+          name={@name <> "__search"}
           type="search"
           class="input-ghost border-1 m-1"
           placeholder="Search"
@@ -134,6 +158,7 @@ defmodule Elemental.Dropdown do
           label={label}
           value={value}
           multi={@multi}
+          selected={value in @value}
           prompt_element_id={@name <> "__prompt"}
           content_element_id={@name <> "__content"}
         />
@@ -147,6 +172,7 @@ defmodule Elemental.Dropdown do
   attr :label, :string, required: true
   attr :value, :string, required: true
   attr :multi, :boolean, required: true
+  attr :selected, :boolean, required: true
   attr :prompt_element_id, :string, required: true
   attr :content_element_id, :string, required: true
 
@@ -164,11 +190,19 @@ defmodule Elemental.Dropdown do
           elemental-hook-prompt-id={@prompt_element_id}
           elemental-hook-content-id={@content_element_id}
           phx-hook={not @multi && "ElementalDropdownSingleItem"}
+          checked={@selected}
         />
         {@label}
       </label>
     </li>
     """
+  end
+
+  defp normalize_assigns(assigns) do
+    assigns
+    |> assign_new(:name, &random/0)
+    |> normalize_options()
+    |> normalize_value()
   end
 
   defp random do
@@ -177,18 +211,39 @@ defmodule Elemental.Dropdown do
     |> Base.encode16()
   end
 
-  defp normalize_assigns(assigns) do
-    assigns
-    |> assign_new(:name, &random/0)
-    |> update(:options, &normalize_options/1)
-  end
-
-  defp normalize_options(options) do
-    Enum.map(options, fn
-      {label, value} -> {label, value}
-      label when is_binary(label) -> {label, label}
+  defp normalize_options(assigns) do
+    update(assigns, :options, fn options ->
+      Enum.map(options, fn
+        {label, value} -> {label, value}
+        label when is_binary(label) -> {label, label}
+      end)
     end)
   end
+
+  defp normalize_value(assigns) do
+    update(assigns, :value, fn
+      nil, _opts -> []
+      value, %{multi: false} when is_binary(value) -> [value]
+      [value], %{multi: false} when is_binary(value) -> [value]
+      values, %{multi: true} when is_list(values) -> values
+    end)
+  end
+
+  # TODO: currently only supports single select mode since we
+  # only support changing prompt in this mode
+  defp prompt_initial_value(%{
+         multi: false,
+         value: [value],
+         prompt: prompt,
+         options: options
+       }) do
+    Enum.find_value(options, prompt, fn
+      {label, ^value} -> label
+      _otherwise -> false
+    end)
+  end
+
+  defp prompt_initial_value(%{prompt: prompt}), do: prompt
 
   defp item_name(%{multi: true, name: name}), do: "#{name}[]"
   defp item_name(%{multi: false, name: name}), do: name
