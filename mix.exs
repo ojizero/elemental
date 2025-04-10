@@ -6,10 +6,11 @@ defmodule Elemental.MixProject do
       app: :elemental,
       version: "0.1.0",
       elixir: "~> 1.17",
+      description: "A Tailwind and DaisyUI based Phoenix components library.",
       elixirc_paths: elixirc_paths(Mix.env()),
-      start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      package: package()
     ]
   end
 
@@ -21,25 +22,38 @@ defmodule Elemental.MixProject do
     [extra_applications: [:logger]]
   end
 
+  defp package do
+    %{
+      name: :elemental,
+      licenses: ["MIT"],
+      files: ~w(mix.exs package.json lib priv LICENCE README.md),
+      links: %{"GitHub" => "https://github.com/ojizero/elemental"}
+    }
+  end
+
   defp deps do
     [
-      {:phoenix, "~> 1.7.14"},
-      {:phoenix_html, "~> 4.1"},
-      {:phoenix_live_view, "~> 1.0"},
-      {:phoenix_storybook, "~> 0.8"},
-      {:phoenix_playground, "~> 0.1.6"},
-      {:phoenix_html_helpers, "~> 1.0"},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev, only: [:dev, :test]},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev, only: [:dev, :test]},
+      {:phoenix, "~> 1.7.14", only: [:dev, :test]},
+      {:phoenix_html, "~> 4.1", only: [:dev, :test]},
+      {:phoenix_live_view, "~> 1.0", only: [:dev, :test]},
+      {:phoenix_storybook, "~> 0.8", only: [:dev, :test]},
+      {:phoenix_playground, "~> 0.1.6", only: [:dev, :test]},
+      {:phoenix_html_helpers, "~> 1.0", only: [:dev, :test]}
     ]
   end
 
   defp aliases do
     [
-      setup: ["deps.get", "assets.setup", "assets.build"],
+      "dev.setup": ["deps.get", "assets.setup", "assets.storybook"],
+      "rel.setup": ["deps.get", "assets.setup", "assets.release"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind storybook", "esbuild storybook"],
-      storybook: ["run storybook.exs"]
+      "assets.release": ["tailwind release", "esbuild release"],
+      "assets.storybook": ["tailwind storybook", "esbuild storybook"],
+      storybook: ["run storybook.exs"],
+      release: ["rel.setup", "hex.publish"]
     ]
   end
 end
