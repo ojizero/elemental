@@ -14,10 +14,7 @@ function debounce(fun, timeoutMs) {
  *
  */
 export const ElementalDropdownSearch = {
-  mounted() {
-    console.log("mounted search")
-    this.el.oninput = debounce(() => this.filterSibling(), 100)
-  },
+  mounted() { this.el.oninput = debounce(() => this.filterSibling(), 100) },
 
   filterSibling() {
     const text = this.el.value.toLowerCase()
@@ -73,9 +70,7 @@ export const ElementalDropdownSingleItem = {
   hideAllPrompts() {
     const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
     const promptEl = document.getElementById(promptId)
-    console.log(promptEl)
     Array.from(promptEl.children).forEach((child) => {
-      console.log({ id: child.id, classList: child.classList })
       const classList = child.classList
       if (!classList.contains("hidden")) {
         classList.add("hidden")
@@ -106,6 +101,7 @@ export const ElementalDropdownMultiItem = {
     this.el.onclick = () => {
       this.hideDefaultPrompt()
       this.toggleSelf()
+      this.maybeShowDefaultPrompt()
     }
   },
 
@@ -117,8 +113,23 @@ export const ElementalDropdownMultiItem = {
     }
   },
 
+  showDefaultPrompt() {
+    const promptId = this.el.getAttribute("elemental-hook--default-prompt-id")
+    const promptEl = document.getElementById(promptId)
+    if (promptEl.classList.contains("hidden")) {
+      promptEl.classList.remove("hidden")
+    }
+  },
+
   toggleSelf() {
     const displayId = `${this.el.id}_display`
     document.getElementById(displayId).classList.toggle("hidden")
+  },
+
+  maybeShowDefaultPrompt() {
+    const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
+    const promptEl = document.getElementById(promptId)
+    const noPromptShown = Array.from(promptEl.children).every((child) => child.classList.contains("hidden"))
+    if (noPromptShown) this.showDefaultPrompt()
   }
 }
