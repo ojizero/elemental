@@ -2,10 +2,10 @@ import Config
 
 config :tailwind,
   version: "4.1.0",
-  elemental: [
+  storybook: [
     args: ~w(
-      --input=assets/css/app.css
-      --output=priv/static/assets/app.css
+      --input=assets/css/storybook.css
+      --output=priv/static/assets/storybook.css
     ),
     cd: Path.expand("..", __DIR__)
   ]

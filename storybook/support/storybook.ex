@@ -3,7 +3,7 @@ defmodule Elemental.Storybook do
     otp_app: :elemental,
     title: "Elemental Storybook",
     content_path: Path.expand("../", __DIR__),
-    css_path: "/elementals/assets/app.css",
+    css_path: "/elementals/assets/storybook.css",
     js_path: "/elementals/assets/storybook.js",
     themes: [
       default: [name: "Default"],

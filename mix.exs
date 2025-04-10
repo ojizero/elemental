@@ -38,7 +38,7 @@ defmodule Elemental.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind elemental", "esbuild storybook"],
+      "assets.build": ["tailwind storybook", "esbuild storybook"],
       storybook: ["run storybook.exs"]
     ]
   end
