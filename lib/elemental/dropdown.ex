@@ -10,11 +10,25 @@ defmodule Elemental.Dropdown do
 
   ## Usage
 
+  Make sure in your application to include the required JavaScript hooks
+  required for the main behaviour, found in `dropdown.js`.
+
+  See the [hooks section](#javascript-hooks) for more details.
+
   Most basic usage is done by simply passing it `options`
 
      <.dropdown options={["Foo", "Bar"]}/>
 
   See `dropdown/1` for details on the support properties and their behaviour.
+
+  ## JavaScript hooks
+
+  This implementation requires JavaScript hooks for it's main behaviour,
+  utilizes 3 main hooks
+
+  - `ElementalDropdownSearch` implementing filtering/search behaviour when enabled.
+  - `ElementalDropdownSingleItem` implementing prompt changes when using single item mode.
+  - `ElementalDropdownMultiItem` implementing prompt changes when using multi item mode.
   """
 
   use Elemental.Component
@@ -121,25 +135,29 @@ defmodule Elemental.Dropdown do
        the "visible"/"interactive" bit of the dropdown.
        """
 
-  #  TODO: implement this to allow for configuring the display of the badges for multi mode
-  #  TODO: implement abstraction to allow user to call on a cancel button to deselect an item here
-  # slot :selected_badge,
-  #   doc: """
-  #   A slot declaring how to render the prompt value. The default value would
-  #   render the items inside a simple span as badges.
-
-  #   ### Notes
-
-  #   - This will not be called for the default prompt value.
-  #   - This will be called only once with single selection mode.
-  #   - This will be called multiple times, one after the other, in
-  #     multiple selection mode for each selected value.
-  #   - The items in multiple selection mode will be wrapped in a flex
-  #     with wrap on overflow.
-  #   """
-
   @doc """
-  The primary dropdown component.
+  > The primary dropdown component.
+
+  This dropdown attempts to provide a fully featured dropdown/select element
+  with native support for searching along with multiple select mode out
+  of the box.
+
+  ## Implementation considerations
+
+  The component is implemented as a dead/stateless component as to simplify it's
+  usage and avoid complexities associated with live/stateful components.
+
+  This comes from my dissatisfaction with implementations I found which have behaviours
+  that I kept finding to be non-obvious and odd, from how they interact with
+  events sent to parent vs themselves, along with how they handle their
+  states.
+
+  Additionally the implementation aims to be drop-in compatible with forms in general
+  as well as how forms are handled in Phoenix/LiveView without requiring much fuss.
+
+  The behaviour relies heavily on the provided minimal JavaScript hooks, as well as
+  relying on native form behaviours with how forms deal with radio buttons and
+  checkboxes.
   """
   def dropdown(assigns) do
     assigns = normalize_assigns(assigns)
@@ -242,7 +260,7 @@ defmodule Elemental.Dropdown do
           elemental-hook-content-id={@content_element_id}
           elemental-hook--default-prompt-id={@default_prompt_element_id}
           elemental-hook-prompt-container-id={@prompt_container_element_id}
-          phx-hook={if @multi, do: "ElementalDropdownMultiItem", else: "ElementalDropdownSingleItem"}
+          phx-hook={phx_hook(assigns)}
           checked={@selected}
         />
         {@label}
@@ -290,4 +308,7 @@ defmodule Elemental.Dropdown do
 
   defp item_class(%{multi: true}), do: "checkbox"
   defp item_class(%{multi: false}), do: "hidden"
+
+  defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
+  defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"
 end

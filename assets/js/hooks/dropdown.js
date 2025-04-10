@@ -11,7 +11,16 @@ function debounce(fun, timeoutMs) {
 /**
  * > Implements client-side text search functionality on dropdowns.
  *
+ * Provide client side behaviour for the dropdown search functionality,
+ * introduces an `oninput` event listener that on input changes will
+ * filter the dropdown items based on the search result.
  *
+ * Filtering is performed by simply disabling and hiding items that don't
+ * match the searched term.
+ *
+ * Matching itself is performed by simply downcasing both the `label`
+ * of the item and the inputted text, and checking if the label
+ * contains the inputted text.
  */
 export const ElementalDropdownSearch = {
   mounted() { this.el.oninput = debounce(() => this.filterSibling(), 100) },
