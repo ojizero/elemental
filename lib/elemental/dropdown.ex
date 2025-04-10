@@ -134,7 +134,7 @@ defmodule Elemental.Dropdown do
           label={label}
           value={value}
           multi={@multi}
-          hook_target_id={@name <> "__prompt"}
+          prompt_element_id={@name <> "__prompt"}
         />
       </ul>
     </div>
@@ -145,7 +145,7 @@ defmodule Elemental.Dropdown do
   attr :name, :string, required: true
   attr :label, :string, required: true
   attr :value, :string, required: true
-  attr :hook_target_id, :string, required: true
+  attr :prompt_element_id, :string, required: true
   attr :multi, :boolean, required: true
 
   defp dropdown_item(assigns) do
@@ -155,21 +155,11 @@ defmodule Elemental.Dropdown do
         <input
           id={@id}
           name={@name}
-          type={
-            cond do
-              @multi -> "checkbox"
-              not @multi -> "radio"
-            end
-          }
-          class={
-            cond do
-              @multi -> "checkbox"
-              not @multi -> "hidden"
-            end
-          }
           value={@value}
+          type={item_type(assigns)}
+          class={item_class(assigns)}
           elemental-hook-label={@label}
-          elemental-hook-prompt-id={@hook_target_id}
+          elemental-hook-prompt-id={@prompt_element_id}
           phx-hook={not @multi && "ElementalDropdownSingleItem"}
         />
         {@label}
@@ -196,4 +186,10 @@ defmodule Elemental.Dropdown do
       label when is_binary(label) -> {label, label}
     end)
   end
+
+  defp item_type(%{multi: true}), do: "checkbox"
+  defp item_type(%{multi: false}), do: "radio"
+
+  defp item_class(%{multi: true}), do: "checkbox"
+  defp item_class(%{multi: false}), do: "hidden"
 end
