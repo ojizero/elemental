@@ -9,11 +9,11 @@ defmodule Elemental.Storybook.Components.Dropdown do
     [
       %Variation{
         id: :single_select,
-        attributes: %{prompt: "Select", options: @options}
+        attributes: %{prompt: "Dropdown", options: @options}
       },
       %Variation{
         id: :multi_select,
-        attributes: %{prompt: "Select", options: @options, multi: true}
+        attributes: %{prompt: "Dropdown", options: @options, multi: true}
       }
     ]
   end

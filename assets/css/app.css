@@ -8,3 +8,4 @@
 /* Temporary to allow colors in storybook */
 /* TODO: update storybook to safelist everything + remove from here */
 @source inline("text-{accent,error,info,neutral,primary,secondary,success,warning}");
+@source inline("hidden");

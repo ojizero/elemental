@@ -29,15 +29,16 @@ defmodule Elemental.MixProject do
       {:phoenix_storybook, "~> 0.8"},
       {:phoenix_playground, "~> 0.1.6"},
       {:phoenix_html_helpers, "~> 1.0"},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev}
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev}
     ]
   end
 
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing"],
-      "assets.build": ["tailwind elemental"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind elemental", "esbuild storybook"],
       storybook: ["run storybook.exs"]
     ]
   end

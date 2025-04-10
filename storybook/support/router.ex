@@ -9,7 +9,7 @@ defmodule Elemental.Storybook.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {PhoenixPlayground.Layout, :root}
-    plug :protect_from_forgery
+    # plug :protect_from_forgery
     plug :put_secure_browser_headers
 
     plug Plug.Static,
