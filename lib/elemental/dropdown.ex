@@ -105,6 +105,11 @@ defmodule Elemental.Dropdown do
        - This features JavaScript enabled in the browser along with Hooks enabled.
        """
 
+  attr :searchable_inline,
+       :boolean,
+       default: false,
+       doc: "To enable inlining of the search field for the dropdown (experimental/buggy)."
+
   attr :align,
        :string,
        values: ~w(start center end),
@@ -212,8 +217,15 @@ defmodule Elemental.Dropdown do
           name={@name}
           value={@value}
           multi={@multi}
-          prompt={@prompt}
+          prompt={unless @searchable and @searchable_inline, do: @prompt}
           options={@options}
+        />
+        <.dropdown_search
+          :if={@searchable and @searchable_inline}
+          id={@name <> "__search"}
+          name={@name <> "__search"}
+          placeholder={@prompt}
+          filterable_content_id={@name <> "__content"}
         />
       </div>
       <ul
@@ -221,14 +233,12 @@ defmodule Elemental.Dropdown do
         tabindex="0"
         class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
       >
-        <input
-          :if={@searchable}
+        <.dropdown_search
+          :if={@searchable and not @searchable_inline}
           id={@name <> "__search"}
           name={@name <> "__search"}
-          type="search"
-          class="input-ghost border-1 m-1"
           placeholder="Search"
-          phx-hook="ElementalDropdownSearch"
+          filterable_content_id={@name <> "__content"}
         />
         <.dropdown_item
           :for={{{label, value}, index} <- Enum.with_index(@options)}
@@ -250,12 +260,14 @@ defmodule Elemental.Dropdown do
   attr :name, :string, required: true
   attr :value, :list, required: true
   attr :multi, :boolean, required: true
-  attr :prompt, :string, required: true
+  attr :prompt, :string, default: nil
   attr :options, :list, required: true
 
   defp dropdown_prompt(assigns) do
     ~H"""
-    <span id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>{@prompt}</span>
+    <span :if={@prompt} id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>
+      {@prompt}
+    </span>
     <span
       :for={{{label, value}, index} <- Enum.with_index(@options)}
       id={@name <> "__item_#{index}_display"}
@@ -295,6 +307,25 @@ defmodule Elemental.Dropdown do
         {@label}
       </label>
     </li>
+    """
+  end
+
+  attr :id, :string, required: true
+  attr :name, :string, required: true
+  attr :placeholder, :string, required: true
+  attr :filterable_content_id, :string, required: true
+
+  defp dropdown_search(assigns) do
+    ~H"""
+    <input
+      id={@id}
+      name={@name}
+      type="search"
+      class="input-ghost border-1 m-1"
+      placeholder={@placeholder}
+      phx-hook="ElementalDropdownSearch"
+      elemental-hook-filterable-content-id={@filterable_content_id}
+    />
     """
   end
 

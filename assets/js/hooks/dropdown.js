@@ -23,20 +23,23 @@ function debounce(fun, timeoutMs) {
  * contains the inputted text.
  */
 export const ElementalDropdownSearch = {
-  mounted() { this.el.oninput = debounce(() => this.filterSibling(), 100) },
+  mounted() {
+    const contentId = this.el.getAttribute("elemental-hook-filterable-content-id")
+    const contentEl = document.getElementById(contentId)
+    this.el.oninput = debounce(() => this.filterSibling(contentEl), 100)
+  },
 
-  filterSibling() {
+  filterSibling(contentEl) {
     const text = this.el.value.toLowerCase()
-    this.listAllSiblings().forEach(el => {
+    this.listAllItems(contentEl).forEach(el => {
       const label = el.getAttribute("elemental-label").toLowerCase()
-
       if (label.includes(text)) this.showItem(el)
       else this.hideItem(el)
     })
   },
 
-  listAllSiblings() {
-    return Array.from(this.el.parentNode.children).filter(child => child !== this.el)
+  listAllItems(contentEl) {
+    return Array.from(contentEl.children).filter(child => child !== this.el)
   },
 
   showItem(el) {
@@ -67,14 +70,11 @@ export const ElementalDropdownSingleItem = {
     // with radio buttons, i.e. click implies selection.
     this.el.onclick = () => {
       this.closeDropdown()
-      this.updatePrompt()
+      this.hideAllPrompts()
+      this.showSelectedPrompt()
     }
   },
 
-  updatePrompt() {
-    this.hideAllPrompts()
-    this.showSelectedPrompt()
-  },
 
   hideAllPrompts() {
     const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
