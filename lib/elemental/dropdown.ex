@@ -36,9 +36,8 @@ defmodule Elemental.Dropdown do
   usage and avoid complexities associated with live/stateful components.
 
   This comes from my dissatisfaction with implementations I found which have behaviours
-  that I kept finding to be non-obvious and odd, from how they interact with
-  events sent to parent vs themselves, along with how they handle their
-  states.
+  that I kept finding to be non-obvious and odd, from how they interact with events
+  sent to parent vs themselves, along with how they handle their states.
 
   Additionally the implementation aims to be drop-in compatible with forms in general
   as well as how forms are handled in Phoenix/LiveView without requiring much fuss.
