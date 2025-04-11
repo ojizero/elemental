@@ -114,20 +114,51 @@ export const ElementalDropdownMultiItem = {
     }
   },
 
+  isPromptInlined() {
+    return this.el.getAttribute("elemental-hook-uses-inlined-search") != null
+  },
+
   hideDefaultPrompt() {
-    const promptId = this.el.getAttribute("elemental-hook--default-prompt-id")
+    const promptId = this.el.getAttribute("elemental-hook-default-prompt-id")
     const promptEl = document.getElementById(promptId)
-    if (!promptEl.classList.contains("hidden")) {
-      promptEl.classList.add("hidden")
+    if (promptEl.nodeName === "INPUT") this.hidePromptPlaceholder(promptEl)
+    else this.hidePromptSpan(promptEl)
+  },
+
+  hidePromptSpan(el) {
+    if (!el.classList.contains("hidden")) {
+      el.classList.add("hidden")
+    }
+  },
+
+  hidePromptPlaceholder(el) {
+    const placeholder = el.getAttribute("placeholder")
+    const savedPlaceholder = el.getAttribute("elemental-private-placeholder")
+    if (savedPlaceholder == null) {
+      el.setAttribute("elemental-private-placeholder", placeholder)
+      el.setAttribute("placeholder", "...")
     }
   },
 
   showDefaultPrompt() {
-    const promptId = this.el.getAttribute("elemental-hook--default-prompt-id")
+    console.log("showDefaultPrompt")
+    const promptId = this.el.getAttribute("elemental-hook-default-prompt-id")
     const promptEl = document.getElementById(promptId)
-    if (promptEl.classList.contains("hidden")) {
-      promptEl.classList.remove("hidden")
+    if (promptEl.nodeName === "INPUT") this.showPromptPlaceholder(promptEl)
+    else this.showPromptSpan(promptEl)
+  },
+
+  showPromptSpan(el) {
+    if (el.classList.contains("hidden")) {
+      el.classList.remove("hidden")
     }
+  },
+
+  showPromptPlaceholder(el) {
+    const placeholder = el.getAttribute("elemental-private-placeholder")
+    console.log({ placeholder })
+    el.setAttribute("placeholder", placeholder)
+    el.removeAttribute("elemental-private-placeholder")
   },
 
   toggleSelf() {
@@ -138,7 +169,12 @@ export const ElementalDropdownMultiItem = {
   maybeShowDefaultPrompt() {
     const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
     const promptEl = document.getElementById(promptId)
-    const noPromptShown = Array.from(promptEl.children).every((child) => child.classList.contains("hidden"))
+    const noPromptShown = Array.from(promptEl.children).every((child) => {
+      const isInput = child.nodeName === "INPUT"
+      const isHidden = child.classList.contains("hidden")
+      // This is to handle inlined search prompt case
+      return isInput || isHidden
+    })
     if (noPromptShown) this.showDefaultPrompt()
   }
 }

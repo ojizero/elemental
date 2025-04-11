@@ -120,10 +120,13 @@ defmodule Elemental.Dropdown do
        - This features JavaScript enabled in the browser along with Hooks enabled.
        """
 
-  attr :searchable_inline,
+  attr :"searchable-inline",
        :boolean,
        default: false,
-       doc: "To enable inlining of the search field for the dropdown (experimental/buggy)."
+       doc: """
+       To enable inlining of the search field for the dropdown (experimental/buggy).
+       Implies `searchable` if enabled.
+       """
 
   attr :align,
        :string,
@@ -211,15 +214,17 @@ defmodule Elemental.Dropdown do
           @class
         ]}
       >
+        <%!-- phx-hook={(@searchable and @inline_search) && "ElementalDropdownInlinedSearch"}
+        elemental-hook-search-id={@name <> "__search"} --%>
         <.dropdown_prompt
           name={@name}
           value={@value}
           multi={@multi}
-          prompt={unless @searchable and @searchable_inline, do: @prompt}
+          prompt={unless @searchable and @inline_search, do: @prompt}
           options={@options}
         />
         <.dropdown_search
-          :if={@searchable and @searchable_inline}
+          :if={@searchable and @inline_search}
           id={@name <> "__search"}
           name={@name <> "__search"}
           placeholder={@prompt}
@@ -232,7 +237,7 @@ defmodule Elemental.Dropdown do
         class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
       >
         <.dropdown_search
-          :if={@searchable and not @searchable_inline}
+          :if={@searchable and not @inline_search}
           id={@name <> "__search"}
           name={@name <> "__search"}
           placeholder="Search"
@@ -247,7 +252,12 @@ defmodule Elemental.Dropdown do
           multi={@multi}
           selected={value in @value}
           content_element_id={@name <> "__content"}
-          default_prompt_element_id={@name <> "__default_prompt"}
+          default_prompt_element_id={
+            cond do
+              @searchable and @inline_search -> @name <> "__search"
+              :otherwise -> @name <> "__default_prompt"
+            end
+          }
           prompt_container_element_id={@name <> "__prompt_container"}
         />
       </ul>
@@ -297,7 +307,7 @@ defmodule Elemental.Dropdown do
           type={item_type(assigns)}
           class={item_class(assigns)}
           elemental-hook-content-id={@content_element_id}
-          elemental-hook--default-prompt-id={@default_prompt_element_id}
+          elemental-hook-default-prompt-id={@default_prompt_element_id}
           elemental-hook-prompt-container-id={@prompt_container_element_id}
           phx-hook={phx_hook(assigns)}
           checked={@selected}
@@ -332,6 +342,7 @@ defmodule Elemental.Dropdown do
     |> assign_new(:name, &random/0)
     |> normalize_options()
     |> normalize_value()
+    |> normalize_search_props()
   end
 
   defp normalize_options(assigns) do
@@ -350,6 +361,15 @@ defmodule Elemental.Dropdown do
       [value], %{multi: false} when is_binary(value) -> [value]
       values, %{multi: true} when is_list(values) -> values
     end)
+  end
+
+  defp normalize_search_props(%{"searchable-inline": inline_search} = assigns) do
+    assigns
+    # Rename it to snake_case to allow `@` access in HEEx whilst
+    # maintaining HTML like kebab-case external API.
+    |> assign(:inline_search, inline_search)
+    # If inlined search is enabled set enable searchability.
+    |> update(:searchable, fn searchable -> inline_search or searchable end)
   end
 
   defp item_name(%{multi: true, name: name}), do: "#{name}[]"
