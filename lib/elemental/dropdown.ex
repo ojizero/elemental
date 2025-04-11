@@ -214,8 +214,6 @@ defmodule Elemental.Dropdown do
           @class
         ]}
       >
-        <%!-- phx-hook={(@searchable and @inline_search) && "ElementalDropdownInlinedSearch"}
-        elemental-hook-search-id={@name <> "__search"} --%>
         <.dropdown_prompt
           name={@name}
           value={@value}
