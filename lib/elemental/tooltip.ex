@@ -1,5 +1,13 @@
 defmodule Elemental.Tooltip do
-  @moduledoc "> Exposing Daisy tooltips as Phoenix components."
+  @moduledoc """
+  > Exposing Daisy tooltips as Phoenix components.
+
+  ## Usage
+
+      <.tooltip tip="Tooltip value.">
+        Something with a tooltip.
+      </.tooltip>
+  """
 
   use Elemental.Component
 
@@ -29,7 +37,7 @@ defmodule Elemental.Tooltip do
   @doc """
   Provides a Phoenix functional component wrapping the tooltip CSS based component.
 
-  Wrap a given inner slot with a `div` defining the tooltip attribute, and maps
+  Wraps a given inner slot with a `div` defining the tooltip attribute, and maps
   the given attributes to useful tooltip properties.
   """
   def tooltip(assigns) do

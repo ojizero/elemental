@@ -1,5 +1,11 @@
 defmodule Elemental.Loading do
-  @moduledoc "> Exposing Daisy loaders as Phoenix components."
+  @moduledoc """
+  > Exposing Daisy loaders as Phoenix components.
+
+  ## Usage
+
+      <.loading />
+  """
 
   use Elemental.Component
 

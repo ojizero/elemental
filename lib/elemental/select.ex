@@ -10,7 +10,7 @@ defmodule Elemental.Select do
 
   Most basic usage is done by simply passing it `options`
 
-     <.select options={["Foo", "Bar"]}/>
+      <.select options={["Foo", "Bar"]}/>
 
   See `select/1` for details on the support properties and their behaviour.
   """

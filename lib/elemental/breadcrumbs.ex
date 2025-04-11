@@ -1,5 +1,15 @@
 defmodule Elemental.Breadcrumbs do
-  @moduledoc "> Exposing Daisy breadcrumbs as Phoenix components."
+  @moduledoc """
+  > Exposing Daisy breadcrumbs as Phoenix components.
+
+  ## Usage
+
+      <.breadcrumbs>
+        <:item>Foo</:item>
+        <:item>Bar</:item>
+        <:item><a href="example.org">Baz</a></:item>
+      </.breadcrumbs>
+  """
 
   use Elemental.Component
 

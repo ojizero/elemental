@@ -17,7 +17,7 @@ defmodule Elemental.Dropdown do
 
   Most basic usage is done by simply passing it `options`
 
-     <.dropdown options={["Foo", "Bar"]}/>
+      <.dropdown options={["Foo", "Bar"]}/>
 
   See `dropdown/1` for details on the support properties and their behaviour.
 
@@ -30,7 +30,22 @@ defmodule Elemental.Dropdown do
   - `ElementalDropdownSingleItem` implementing prompt changes when using single item mode.
   - `ElementalDropdownMultiItem` implementing prompt changes when using multi item mode.
 
-  ##
+  ## Implementation considerations
+
+  The component is implemented as a dead/stateless component as to simplify it's
+  usage and avoid complexities associated with live/stateful components.
+
+  This comes from my dissatisfaction with implementations I found which have behaviours
+  that I kept finding to be non-obvious and odd, from how they interact with
+  events sent to parent vs themselves, along with how they handle their
+  states.
+
+  Additionally the implementation aims to be drop-in compatible with forms in general
+  as well as how forms are handled in Phoenix/LiveView without requiring much fuss.
+
+  The behaviour relies heavily on the provided minimal JavaScript hooks, as well as
+  relying on native form behaviours with how forms deal with radio buttons and
+  checkboxes.
   """
 
   use Elemental.Component
@@ -163,23 +178,6 @@ defmodule Elemental.Dropdown do
 
   > The API provided here works drop-in with Elemental's select
   > component (see `Elemental.Select`).
-
-  ## Implementation considerations
-
-  The component is implemented as a dead/stateless component as to simplify it's
-  usage and avoid complexities associated with live/stateful components.
-
-  This comes from my dissatisfaction with implementations I found which have behaviours
-  that I kept finding to be non-obvious and odd, from how they interact with
-  events sent to parent vs themselves, along with how they handle their
-  states.
-
-  Additionally the implementation aims to be drop-in compatible with forms in general
-  as well as how forms are handled in Phoenix/LiveView without requiring much fuss.
-
-  The behaviour relies heavily on the provided minimal JavaScript hooks, as well as
-  relying on native form behaviours with how forms deal with radio buttons and
-  checkboxes.
 
   ## Select compatibility
 
