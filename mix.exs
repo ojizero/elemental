@@ -35,25 +35,23 @@ defmodule Elemental.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev, only: [:dev, :test]},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev, only: [:dev, :test]},
-      {:phoenix, "~> 1.7.14", only: [:dev, :test]},
-      {:phoenix_html, "~> 4.1", only: [:dev, :test]},
-      {:phoenix_live_view, "~> 1.0", only: [:dev, :test]},
-      {:phoenix_storybook, "~> 0.8", only: [:dev, :test]},
-      {:phoenix_playground, "~> 0.1.6", only: [:dev, :test]},
-      {:phoenix_html_helpers, "~> 1.0", only: [:dev, :test]}
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:phoenix, "~> 1.7.14"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 1.0"},
+      {:phoenix_html_helpers, "~> 1.0"}
     ]
   end
 
   defp aliases do
     [
-      "dev.setup": ["deps.get", "assets.setup", "assets.storybook"],
+      "dev.setup": ["deps.get", "assets.setup", "assets.build"],
       "rel.setup": ["deps.get", "assets.setup", "assets.release"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.release": ["tailwind release", "esbuild release"],
-      "assets.storybook": ["tailwind storybook", "esbuild storybook"],
-      storybook: ["run storybook.exs"],
+      "assets.build": ["tailwind elemental", "esbuild elemental"],
+      "assets.release": ["tailwind elemental --minify", "esbuild elemental --minify"],
+      storybook: ["cmd ./storybook.sh"],
       release: ["rel.setup", "hex.publish"]
     ]
   end

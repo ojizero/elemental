@@ -2,9 +2,9 @@ defmodule Elemental.Storybook do
   use PhoenixStorybook,
     otp_app: :elemental,
     title: "Elemental Storybook",
-    content_path: Path.expand("../", __DIR__),
-    css_path: "/elementals/assets/storybook.css",
-    js_path: "/elementals/assets/storybook.js",
+    content_path: Path.expand("../storybook", __DIR__),
+    css_path: "/assets/storybook.css",
+    js_path: "/assets/storybook.js",
     themes: [
       default: [name: "Default"],
       colorful: [name: "Colorful", dropdown_class: "psb-text-pink-600"]
