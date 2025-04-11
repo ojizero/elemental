@@ -23,4 +23,11 @@ defmodule Elemental.Component do
       rest -> Map.put(rest, :class, class)
     end)
   end
+
+  @doc false
+  def random do
+    4
+    |> :crypto.strong_rand_bytes()
+    |> Base.encode16()
+  end
 end

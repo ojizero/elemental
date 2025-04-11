@@ -1,25 +1,104 @@
 defmodule Elemental.Select do
+  @moduledoc """
+  > An abstraction on top of DaisyUI's (& plain HTML) select.
+
+  This abstracts native HTML selects providing an API that is compatible
+  1-1 with `Elemental.Dropdown` aiming to provide consistency between
+  the main/core input components provided by Elemental.
+
+  ## Usage
+
+  Most basic usage is done by simply passing it `options`
+
+     <.select options={["Foo", "Bar"]}/>
+
+  See `select/1` for details on the support properties and their behaviour.
+  """
+
   use Elemental.Component
+
+  attr :options,
+       :list,
+       required: true,
+       doc: """
+       The list of values to select between. This is required to either be a list of
+       strings, or a list of string tuples.
+
+       ### List item types
+
+       - If given as a list of strings (`[String.t]`) each option will use that value
+         as both it's label and value sent to from the dropdown.
+       - If give as a list of tuples (`[{String.t, String.t}]`), those tuples are expected
+         to be two strings, the first being the label to use, while the second is
+         expected to be the value to send from the dropdown.
+       - Mixing the two forms is allowed.
+       - Nested lists translate to option groups. See `Phoenix.HTML.Form.options_for_select/2`.
+       """
 
   attr :prompt,
        :string,
        default: nil,
-       doc: "An optional prompt to display for the select field."
+       doc: "The prompt to display for the the select."
 
-  attr :rest, :global
+  attr :name,
+       :string,
+       required: false,
+       doc: "The name of the dropdown, if not given a random value is selected."
 
-  slot :option, doc: "The options available for the select." do
-    attr :value, :any
-  end
+  attr :value,
+       :string,
+       default: nil,
+       doc: """
+       A value that is selected currently by the component.
 
+       Useful for either preselecting items or to maintaining selected
+       items state across rerenders.
+       """
+
+  attr :color,
+       :string,
+       values: ~w(ghost neutral primary secondary accent info success warning error),
+       required: false,
+       doc: "The select prompt color."
+
+  attr :size,
+       :string,
+       values: ~w(xs sm md lg xl),
+       required: false,
+       doc: "The select prompt size."
+
+  attr :class,
+       :string,
+       default: nil,
+       doc: "Additional CSS classes to pass to the select."
+
+  @doc "> The primary select component."
   def select(assigns) do
-    assigns = prepend_class(assigns, "select")
+    assigns = assign_new(assigns, :name, &random/0)
 
     ~H"""
-    <select {@rest}>
-      <option :if={@prompt} value="" disabled selected>{@prompt}</option>
-      <option :for={option <- @option} value={option[:value]}>{render_slot(option)}</option>
+    <select
+      class={[
+        "select",
+        assigns[:color] && "select-#{@color}",
+        assigns[:size] && "select-#{@size}",
+        @class
+      ]}
+      name={@name}
+    >
+      <option :if={@prompt} value="" disabled selected={prompt_selected?(assigns)}>{@prompt}</option>
+      {Phoenix.HTML.Form.options_for_select(@options, @value)}
     </select>
     """
+  end
+
+  defp prompt_selected?(%{options: options, value: value}) do
+    values =
+      Enum.map(options, fn
+        {_label, value} -> value
+        label -> label
+      end)
+
+    value not in values
   end
 end

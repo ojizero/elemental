@@ -5,7 +5,7 @@ defmodule Elemental.Dropdown do
   Think of it as a more advanced `Elemental.Select` with support for
   multi-select and searching out of the box.
 
-  This is implement in a manner that works drop in in forms and uses
+  This is implement in a manner that works drop-in in forms and uses
   only dead/stateless components with minimal JavaScript.
 
   ## Usage
@@ -29,6 +29,8 @@ defmodule Elemental.Dropdown do
   - `ElementalDropdownSearch` implementing filtering/search behaviour when enabled.
   - `ElementalDropdownSingleItem` implementing prompt changes when using single item mode.
   - `ElementalDropdownMultiItem` implementing prompt changes when using multi item mode.
+
+  ##
   """
 
   use Elemental.Component
@@ -88,6 +90,21 @@ defmodule Elemental.Dropdown do
        default: false,
        doc: "To enable selection of multiple values, passed to consumer as a list."
 
+  attr :searchable,
+       :boolean,
+       default: false,
+       doc: """
+       To enable searching the options of the dropdown.
+
+       Search is performed by looking through the labels for the given
+       input as substring to match on, if it doesn't match the option
+       is disabled, deselected, and hidden.
+
+       #### Notes:
+       - Search is case-insensitive.
+       - This features JavaScript enabled in the browser along with Hooks enabled.
+       """
+
   attr :align,
        :string,
        values: ~w(start center end),
@@ -110,20 +127,17 @@ defmodule Elemental.Dropdown do
        default: false,
        doc: "To open the dropdown immediately."
 
-  attr :searchable,
-       :boolean,
-       default: false,
-       doc: """
-       To enable searching the options of the dropdown.
+  attr :color,
+       :string,
+       values: ~w(ghost neutral primary secondary accent info success warning error),
+       required: false,
+       doc: "The dropdown prompt container color."
 
-       Search is performed by looking through the labels for the given
-       input as substring to match on, if it doesn't match the option
-       is disabled, deselected, and hidden.
-
-       #### Notes:
-       - Search is case-insensitive.
-       - This features JavaScript enabled in the browser along with Hooks enabled.
-       """
+  attr :size,
+       :string,
+       values: ~w(xs sm md lg xl),
+       required: false,
+       doc: "The dropdown prompt container size."
 
   attr :class,
        :string,
@@ -142,6 +156,9 @@ defmodule Elemental.Dropdown do
   with native support for searching along with multiple select mode out
   of the box.
 
+  > The API provided here works drop-in with Elemental's select
+  > component (see `Elemental.Select`).
+
   ## Implementation considerations
 
   The component is implemented as a dead/stateless component as to simplify it's
@@ -158,6 +175,13 @@ defmodule Elemental.Dropdown do
   The behaviour relies heavily on the provided minimal JavaScript hooks, as well as
   relying on native form behaviours with how forms deal with radio buttons and
   checkboxes.
+
+  ## Select compatibility
+
+  While this component provides 1-1 API compatibility the the more simpler
+  `Elemental.Select.select/1`, augmenting it with additional features
+  and interactivity, there's the caveat that it does not yet
+  support option groups.
   """
   def dropdown(assigns) do
     assigns = normalize_assigns(assigns)
@@ -177,7 +201,12 @@ defmodule Elemental.Dropdown do
         id={@name <> "__prompt_container"}
         tabindex="0"
         role="button"
-        class={["select m-1 overflow-scroll gap-1", @class]}
+        class={[
+          "select m-1 overflow-scroll gap-1",
+          assigns[:color] && "select-#{@color}",
+          assigns[:size] && "select-#{@size}",
+          @class
+        ]}
       >
         <.dropdown_prompt
           name={@name}
@@ -274,12 +303,6 @@ defmodule Elemental.Dropdown do
     |> assign_new(:name, &random/0)
     |> normalize_options()
     |> normalize_value()
-  end
-
-  defp random do
-    4
-    |> :crypto.strong_rand_bytes()
-    |> Base.encode16()
   end
 
   defp normalize_options(assigns) do

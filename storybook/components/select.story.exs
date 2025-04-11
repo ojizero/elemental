@@ -7,11 +7,7 @@ defmodule Elemental.Storybook.Components.Select do
     [
       %Variation{
         id: :select,
-        attributes: %{prompt: "Select"},
-        slots: [
-          "<:option>Foo</:option>",
-          "<:option>Bar</:option>"
-        ]
+        attributes: %{prompt: "Select", options: ["Foo", {"Bar", "Baz"}]}
       }
     ]
   end
