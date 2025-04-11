@@ -80,9 +80,12 @@ export const ElementalDropdownSingleItem = {
     const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
     const promptEl = document.getElementById(promptId)
     Array.from(promptEl.children).forEach((child) => {
+      const isSpan = child.nodeName === "SPAN"
       const classList = child.classList
-      if (!classList.contains("hidden")) {
+      if (isSpan && !classList.contains("hidden")) {
         classList.add("hidden")
+      } else if (!isSpan) {
+        child.setAttribute("placeholder", "...")
       }
     })
   },

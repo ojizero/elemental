@@ -124,8 +124,9 @@ defmodule Elemental.Dropdown do
        :boolean,
        default: false,
        doc: """
-       To enable inlining of the search field for the dropdown (experimental/buggy).
-       Implies `searchable` if enabled.
+       To enable inlining of the search field for the dropdown.
+
+       > Implies `searchable` if enabled.
        """
 
   attr :align,
@@ -252,12 +253,7 @@ defmodule Elemental.Dropdown do
           multi={@multi}
           selected={value in @value}
           content_element_id={@name <> "__content"}
-          default_prompt_element_id={
-            cond do
-              @searchable and @inline_search -> @name <> "__search"
-              :otherwise -> @name <> "__default_prompt"
-            end
-          }
+          default_prompt_element_id={default_prompt_element_id(assigns)}
           prompt_container_element_id={@name <> "__prompt_container"}
         />
       </ul>
@@ -383,4 +379,10 @@ defmodule Elemental.Dropdown do
 
   defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
   defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"
+
+  defp default_prompt_element_id(%{name: name, searchable: true, inline_search: true}),
+    do: name <> "__search"
+
+  defp default_prompt_element_id(%{name: name}),
+    do: name <> "__default_prompt"
 end
