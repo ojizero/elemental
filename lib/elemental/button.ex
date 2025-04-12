@@ -177,6 +177,9 @@ defmodule Elemental.Button do
   end
 
   @doc false
+  def component(%{"elemental-disable-styles": true} = _assigns), do: []
+  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
+
   def component(assigns) do
     [
       "btn",

@@ -101,6 +101,7 @@ defmodule Elemental.Select do
 
   @doc false
   def component(%{"elemental-disable-styles": true} = _assigns), do: []
+  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
 
   def component(assigns) do
     [

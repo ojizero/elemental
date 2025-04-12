@@ -1,5 +1,9 @@
 defmodule Elemental.Field do
   @moduledoc """
+  Building on top of `Elemental.Input`, `Elemental.Dropdown`, and
+  `Elemental.Select`, provide a wrapped component that easy to
+  and decorate as needed.
+
   an input with overlay, consider merging dropdown/select into it
 
   <.input type="type" /> <- simplest
@@ -33,78 +37,174 @@ defmodule Elemental.Field do
 
   alias Elemental.Input
   alias Elemental.Select
+  alias Elemental.Button
   alias Elemental.Dropdown
 
-  attr :for,
-       Phoenix.HTML.FormField,
-       #  required: true,
-       doc: ""
+  # TODO: add inner block for button (or otherwise pass value)
+  # TODO: support floating labels
+  # TODO: error display
 
   attr :type,
        :string,
        default: "text",
        values: ~w(checkbox color date datetime-local email file hidden image
-                  month number password radio range search tel text time url
-                  week dropdown select),
+                 month number password radio range search tel text time url
+                 week dropdown select button),
        doc: """
        > The form field's type.
 
        ## Types
 
-       - `dropdown` power by `Elemental.Dropdown.dropdown/1`.
-       - `select` power by `Elemental.Select.select/1`.
+       - `dropdown` powered by `Elemental.Dropdown.dropdown/1`.
+       - `select` powered by `Elemental.Select.select/1`.
+       - `button` powered by `Elemental.Button.button/1`.
        - Any value supported by `Elemental.Input.input/1`.
        """
 
+  slot :overlay,
+    doc: """
+    """ do
+    attr :position,
+         :string,
+         values: ~w(start end),
+         doc: """
+         """
+
+    attr :placement,
+         :string,
+         values: ~w(edge center),
+         doc: """
+         """
+  end
+
   slot :label,
-    doc: "" do
+    doc: """
+    """ do
+    attr :value,
+         :string,
+         required: true,
+         doc: ""
+
     attr :position,
          :string,
          values: ~w(start end),
-         doc: ""
+         doc: """
+         """
 
-    attr :"relative-to", :string
-  end
-
-  slot :overlay do
-    attr :position,
+    attr :placement,
          :string,
-         values: ~w(start end),
-         doc: ""
+         values: ~w(edge center),
+         doc: """
+         """
   end
 
-  def field(%{for: %Phoenix.HTML.FormField{} = field} = assigns) do
-    # errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
+  # TODO: rename to input_field or user_input?
 
-    assigns
-    |> assign(field: nil, id: assigns.id || field.id)
-    # |> assign(:errors, Enum.map(errors, &translate_error(&1)))
-    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
-    |> assign_new(:value, fn -> field.value end)
-    |> field()
+  def field(%{for: %Phoenix.HTML.FormField{}} = assigns) do
+    # TODO:
+    ~H"""
+    """
   end
 
   def field(assigns) do
+    assigns = normalize_assigns(assigns) |> IO.inspect(label: :assigns)
+
     ~H"""
-    <label class={component(assigns)}>
-      <.wrapped_component {assigns} />
+    <label class={[component(assigns), "validator"]}>
+      <.overlay :for={element <- @start_edge} element={element} />
+      <.overlay :for={element <- @start_center} element={element} />
+      <.wrapped_component {cleanup_assigns(assigns)} />
+      <.overlay :for={element <- @end_center} element={element} />
+      <.overlay :for={element <- @end_edge} element={element} />
     </label>
     """
   end
 
-  defp wrapped_component(%{type: "select"} = assigns) do
-    ~H"<Select.select {assigns} elemental-disable-styles />"
-  end
+  defp wrapped_component(%{type: "select"} = assigns),
+    do: ~H"<Select.select {assigns} elemental-disable-styles />"
 
-  defp wrapped_component(%{type: "dropdown"} = assigns) do
-    ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
-  end
+  defp wrapped_component(%{type: "button"} = assigns),
+    do: ~H"<Button.button {assigns} elemental-disable-styles></Button.button>"
 
-  defp wrapped_component(assigns) do
-    ~H"<Input.input {assigns} elemental-disable-styles />"
-  end
+  defp wrapped_component(%{type: "dropdown"} = assigns),
+    do: ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
+
+  defp wrapped_component(%{type: type} = assigns)
+       when type in ~w(checkbox color radio range),
+       do: ~H"<Input.input {assigns} />"
+
+  defp wrapped_component(assigns),
+    do: ~H"<Input.input {assigns} elemental-disable-styles />"
 
   defp component(%{type: "select"} = assigns), do: Select.component(assigns)
+  defp component(%{type: "button"} = assigns), do: Button.component(assigns)
   defp component(%{type: "dropdown"} = assigns), do: Dropdown.component(assigns)
+
+  defp component(%{type: type} = _assigns)
+       when type in ~w(checkbox color radio range),
+       do: ["input"]
+
   defp component(assigns), do: Input.component(assigns)
+
+  defp overlay(%{element: %{__slot__: :label}} = assigns),
+    do: ~H[<span class="label">{@element.value}</span>]
+
+  defp overlay(%{element: %{__slot__: :overlay}} = assigns),
+    do: ~H"{render_slot(@element)}"
+
+  defp overlay(%{element: fun} = assigns) when is_function(fun, 1),
+    do: fun.(assigns)
+
+  defp normalize_assigns(assigns) do
+    assigns
+    |> maybe_randomized_name()
+    |> normalize_slots()
+  end
+
+  defp normalize_slots(assigns) do
+    assigns
+    |> assign_slots_defaults()
+    |> assign_overlay_elements(:start_edge, "start", "edge")
+    |> assign_overlay_elements(:start_center, "start", "center")
+    |> assign_overlay_elements(:end_center, "end", "center")
+    |> assign_overlay_elements(:end_edge, "end", "edge")
+    |> Map.delete(:label)
+    |> Map.delete(:overlay)
+  end
+
+  defp assign_slots_defaults(assigns) do
+    assigns
+    |> overlay_elements()
+    |> IO.inspect(label: :alloverflow)
+
+    assigns
+  end
+
+  defp assign_overlay_elements(assigns, key, position, placement) do
+    assigns
+    |> overlay_elements()
+    |> Enum.filter(fn el ->
+      el.position == position and el.placement == placement
+    end)
+    # |> Enum.map(fn el ->
+    #   fn assigns ->
+    #     assigns = assign(assigns, :element, el)
+    #     ~H"<.overlay element={@element} />"
+    #   end
+    # end)
+    |> then(fn elements ->
+      assign(assigns, key, elements)
+    end)
+  end
+
+  defp overlay_elements(%{label: labels, overlay: overlays}),
+    do: Enum.concat(labels, overlays)
+
+  defp cleanup_assigns(assigns) do
+    assigns
+    |> Map.delete(:start_edge)
+    |> Map.delete(:start_center)
+    |> Map.delete(:end_center)
+    |> Map.delete(:end_edge)
+  end
 end
