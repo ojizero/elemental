@@ -130,14 +130,14 @@ defmodule Elemental.Dropdown do
 
   attr :align,
        :string,
-       values: ~w(start center end),
        default: "start",
+       values: ~w(start center end),
        doc: "Specify the alignment for the dropdown."
 
   attr :from,
        :string,
-       values: ~w(top bottom left right),
        default: "bottom",
+       values: ~w(top bottom left right),
        doc: "Specify where the dropdown will appear from."
 
   attr :hover,
@@ -152,14 +152,14 @@ defmodule Elemental.Dropdown do
 
   attr :color,
        :string,
-       values: ~w(ghost neutral primary secondary accent info success warning error),
        required: false,
+       values: daisy_colors(),
        doc: "The dropdown prompt container color."
 
   attr :size,
        :string,
-       values: ~w(xs sm md lg xl),
        required: false,
+       values: daisy_sizes(),
        doc: "The dropdown prompt container size."
 
   attr :class,
@@ -208,7 +208,7 @@ defmodule Elemental.Dropdown do
         tabindex="0"
         role="button"
         class={[
-          "select m-1 overflow-scroll gap-1",
+          "select overflow-scroll m-1 gap-1",
           assigns[:color] && "select-#{@color}",
           assigns[:size] && "select-#{@size}",
           @class

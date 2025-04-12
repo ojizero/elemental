@@ -24,7 +24,8 @@ defmodule Elemental.Tooltip do
 
   attr :color,
        :string,
-       default: "primary",
+       required: false,
+       values: daisy_colors(),
        doc: "The color to use for the tooltip."
 
   attr :open,
@@ -45,7 +46,8 @@ defmodule Elemental.Tooltip do
     <div
       class={[
         "tooltip",
-        "tooltip-#{@position} tooltip-#{@color}",
+        "tooltip-#{@position}",
+        assigns[:color] && "tooltip-#{@color}",
         @open && "tooltip-open"
       ]}
       data-tip={@tip}

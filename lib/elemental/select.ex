@@ -43,7 +43,7 @@ defmodule Elemental.Select do
   attr :name,
        :string,
        required: false,
-       doc: "The name of the dropdown, if not given a random value is selected."
+       doc: "The name of the select, if not given a random value is selected."
 
   attr :value,
        :string,
@@ -57,14 +57,14 @@ defmodule Elemental.Select do
 
   attr :color,
        :string,
-       values: ~w(ghost neutral primary secondary accent info success warning error),
        required: false,
+       values: daisy_colors(),
        doc: "The select prompt color."
 
   attr :size,
        :string,
-       values: ~w(xs sm md lg xl),
        required: false,
+       values: daisy_sizes(),
        doc: "The select prompt size."
 
   attr :class,

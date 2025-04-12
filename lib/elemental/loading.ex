@@ -17,13 +17,14 @@ defmodule Elemental.Loading do
 
   attr :color,
        :string,
-       default: "primary",
+       required: false,
+       values: daisy_colors(),
        doc: "Choose which color the loading component will be."
 
   attr :size,
        :string,
-       values: ~w(xs sm md lg xl),
-       default: "md",
+       required: false,
+       values: daisy_sizes(),
        doc: "Choose which size the loading component will be"
 
   attr :screen_reader_text,
@@ -39,8 +40,8 @@ defmodule Elemental.Loading do
       class={[
         "loading",
         "loading-#{@type}",
-        "loading-#{@size}",
-        "text-#{@color}"
+        assigns[:size] && "loading-#{@size}",
+        assigns[:color] && "text-#{@color}"
       ]}
     >
       <span class="sr-only">{@screen_reader_text}</span>

@@ -21,22 +21,12 @@ defmodule Elemental.Button do
   attr :color,
        :string,
        required: false,
-       values: [
-         "neutral",
-         "primary",
-         "secondary",
-         "accent",
-         "info",
-         "success",
-         "warning",
-         "error",
-         "ghost"
-       ],
+       values: daisy_colors(),
        doc: ""
 
   attr :size,
        :string,
-       values: ~w(xs sm md lg xl),
+       values: daisy_sizes(),
        required: false,
        doc: ""
 
@@ -136,7 +126,7 @@ defmodule Elemental.Button do
   def button(%{href: _href} = assigns) do
     ~H"""
     <.link
-      class={button_classes(assigns)}
+      class={component(assigns)}
       href={@href}
       replace={@replace}
       method={@method}
@@ -151,7 +141,7 @@ defmodule Elemental.Button do
   def button(%{navigate: _navigate} = assigns) do
     ~H"""
     <.link
-      class={button_classes(assigns)}
+      class={component(assigns)}
       navigate={@navigate}
       replace={@replace}
       method={@method}
@@ -166,7 +156,7 @@ defmodule Elemental.Button do
   def button(%{patch: _patch} = assigns) do
     ~H"""
     <.link
-      class={button_classes(assigns)}
+      class={component(assigns)}
       patch={@patch}
       replace={@replace}
       method={@method}
@@ -180,13 +170,14 @@ defmodule Elemental.Button do
 
   def button(assigns) do
     ~H"""
-    <button class={button_classes(assigns)} {@rest}>
+    <button class={component(assigns)} {@rest}>
       {render_slot(@inner_block)}
     </button>
     """
   end
 
-  defp button_classes(assigns) do
+  @doc false
+  def component(assigns) do
     [
       "btn",
       assigns[:color] && "btn-#{assigns.color}",

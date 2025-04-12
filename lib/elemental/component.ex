@@ -14,6 +14,19 @@ defmodule Elemental.Component do
   end
 
   @doc false
+  # We treat "ghost" style as a color
+  def daisy_colors,
+    do: ~w(ghost neutral primary secondary accent info success warning error)
+
+  @doc false
+  def daisy_sizes, do: ~w(xs sm md lg xl)
+
+  @doc false
+  def elemental_styles(_assigns) do
+    # TODO: given input decide whether to use component's class or nothing
+  end
+
+  @doc false
   def prepend_class(assigns, class) do
     assigns
     |> assign_new(:rest, fn -> %{} end)
@@ -23,6 +36,10 @@ defmodule Elemental.Component do
       rest -> Map.put(rest, :class, class)
     end)
   end
+
+  @doc false
+  def maybe_randomize_name(assigns),
+    do: assign_new(assigns, :name, &random/0)
 
   @doc false
   def random do
