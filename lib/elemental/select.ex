@@ -74,7 +74,7 @@ defmodule Elemental.Select do
 
   @doc "> The primary select component."
   def select(assigns) do
-    assigns = assign_new(assigns, :name, &random/0)
+    assigns = maybe_randomized_name(assigns)
 
     ~H"""
     <select

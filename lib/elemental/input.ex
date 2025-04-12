@@ -272,7 +272,7 @@ defmodule Elemental.Input do
     assigns =
       assigns
       |> normalize()
-      |> maybe_randomize_name()
+      |> maybe_randomized_name()
 
     ~H"""
     <input

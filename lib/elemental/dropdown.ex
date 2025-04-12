@@ -106,6 +106,11 @@ defmodule Elemental.Dropdown do
        default: false,
        doc: "To enable selection of multiple values, passed to consumer as a list."
 
+  attr :multiple,
+       :boolean,
+       default: false,
+       doc: "Only present for compatibility, if true enables `multi`."
+
   attr :searchable,
        :boolean,
        default: false,
@@ -335,10 +340,11 @@ defmodule Elemental.Dropdown do
 
   defp normalize_assigns(assigns) do
     assigns
-    |> assign_new(:name, &random/0)
+    |> maybe_randomized_name()
     |> normalize_options()
     |> normalize_value()
     |> normalize_search_props()
+    |> normalize_multi()
   end
 
   defp normalize_options(assigns) do
@@ -367,6 +373,9 @@ defmodule Elemental.Dropdown do
     # If inlined search is enabled set enable searchability.
     |> update(:searchable, fn searchable -> inline_search or searchable end)
   end
+
+  defp normalize_multi(%{multiple: true} = assigns), do: assign(assigns, :multi, true)
+  defp normalize_multi(assigns), do: assigns
 
   defp item_name(%{multi: true, name: name}), do: "#{name}[]"
   defp item_name(%{multi: false, name: name}), do: name

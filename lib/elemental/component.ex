@@ -38,7 +38,7 @@ defmodule Elemental.Component do
   end
 
   @doc false
-  def maybe_randomize_name(assigns),
+  def maybe_randomized_name(assigns),
     do: assign_new(assigns, :name, &random/0)
 
   @doc false
