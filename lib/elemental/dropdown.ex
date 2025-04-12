@@ -49,6 +49,8 @@ defmodule Elemental.Dropdown do
 
   use Elemental.Component
 
+  import Elemental.Input
+
   attr :options,
        :list,
        required: true,
@@ -293,17 +295,17 @@ defmodule Elemental.Dropdown do
     ~H"""
     <li elemental-label={@label} elemental-item-id={@id}>
       <label>
-        <input
+        <.input
           id={@id}
+          type={item_type(assigns)}
           name={item_name(assigns)}
           value={@value}
-          type={item_type(assigns)}
-          class={item_class(assigns)}
+          checked={@selected}
+          hidden={not @multi}
+          phx-hook={phx_hook(assigns)}
           elemental-hook-content-id={@content_element_id}
           elemental-hook-default-prompt-id={@default_prompt_element_id}
           elemental-hook-prompt-container-id={@prompt_container_element_id}
-          phx-hook={phx_hook(assigns)}
-          checked={@selected}
         />
         {@label}
       </label>
@@ -318,11 +320,12 @@ defmodule Elemental.Dropdown do
 
   defp dropdown_search(assigns) do
     ~H"""
-    <input
+    <.input
       id={@id}
-      name={@name}
       type="search"
-      class="input-ghost border-1 m-1"
+      name={@name}
+      color="ghost"
+      class="border-1 m-1"
       placeholder={@placeholder}
       phx-hook="ElementalDropdownSearch"
       elemental-hook-filterable-content-id={@filterable_content_id}
@@ -370,9 +373,6 @@ defmodule Elemental.Dropdown do
 
   defp item_type(%{multi: true}), do: "checkbox"
   defp item_type(%{multi: false}), do: "radio"
-
-  defp item_class(%{multi: true}), do: "checkbox"
-  defp item_class(%{multi: false}), do: "hidden"
 
   defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
   defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"

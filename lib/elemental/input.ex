@@ -304,12 +304,12 @@ defmodule Elemental.Input do
   attr :value,
        :string,
        default: nil,
-       doc: "The value of the checkbox."
+       doc: "The value of the checkbox, sent to the form if select."
 
   attr :checked,
        :boolean,
        default: nil,
-       doc: "The checked flag for checkboxes and radios."
+       doc: "The checked flag for the checkbox."
 
   attr :color,
        :string,
@@ -342,38 +342,38 @@ defmodule Elemental.Input do
   attr :name,
        :string,
        required: false,
-       doc: "The name of the input, if not given a random value is selected."
+       doc: "The name of the radio, if not given a random value is selected."
 
   attr :value,
        :string,
        default: nil,
-       doc: "The value of the checkbox."
+       doc: "The value of the radio, sent to the form if select."
 
   attr :checked,
        :boolean,
        default: nil,
-       doc: "The checked flag for checkboxes and radios."
+       doc: "The checked flag for the radio."
 
   attr :color,
        :string,
        required: false,
        values: daisy_colors(),
-       doc: "The checkbox's color."
+       doc: "The radio's color."
 
   attr :size,
        :string,
        required: false,
        values: daisy_sizes(),
-       doc: "The checkbox's size."
+       doc: "The radio's size."
 
   attr :class,
        :string,
        default: nil,
-       doc: "Additional CSS classes to pass to the checkbox."
+       doc: "Additional CSS classes to pass to the radio."
 
   attr :rest,
        :global,
-       doc: "Pass arbitrary attributes over to the checkbox."
+       doc: "Pass arbitrary attributes over to the radio."
 
   @doc "Shorthand for `<.input type=\"radio\" />`"
   def radio(assigns) do

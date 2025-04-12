@@ -33,6 +33,24 @@ defmodule Elemental.Storybook.Components.Dropdown do
           multi: true,
           value: ["Foo", "Baz Value"]
         }
+      },
+      %Variation{
+        id: :single_select_with_search,
+        attributes: %{
+          prompt: "Dropdown",
+          options: @options,
+          searchable: true
+        }
+      },
+      %Variation{
+        id: :multi_select_with_search_inlined,
+        attributes: %{
+          prompt: "Dropdown",
+          options: @options,
+          multi: true,
+          searchable: true,
+          "searchable-inline": true
+        }
       }
     ]
   end
