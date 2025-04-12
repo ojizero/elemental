@@ -23,6 +23,36 @@ defmodule Elemental.Input do
 
   require Logger
 
+  @textual_types_value_documentation """
+  - `checkbox` - the data to submit if checked, arbitrary string.
+  - `color` - always a string which contains a 7-character string specifying
+    an RGB color in hexadecimal format. While you can input the color in
+    either upper- or lower-case, it will be stored in lower-case form.
+    The value is never in any other form, and is never empty.
+  - `email` - the email string;
+      1. An empty string ("") indicating that the user did not enter a value
+         or that the value was removed.
+      1. A single properly-formed email address. This doesn't necessarily mean
+         the email address exists, but it is at least formatted correctly.
+         This means `username@domain` or `username@domain.tld`.
+      1. If `multiple` is enabled the value can be a list of properly-formed
+         comma-separated email addresses. Any trailing and leading
+         whitespace is removed from each address in the list.
+
+  """
+
+  # Types that support min/max.
+  @ordinal_types_value_documentation """
+  - `date` - a possible date string in the format `yyyy-mm-dd`.
+  - `datetime-local` - a valid datetime string that follows the
+    format `YYYY-MM-DDTHH:mm`.
+  - `month` - a valid string in `yyyy-MM` format.
+  - `number` - a valid number.
+  - `range` - a valid number.
+  - `time` - a valid time in `HH:mm` format.
+  - `week` - a valid week in `YYYY-W<week-number>` format.
+  """
+
   attr :type,
        :string,
        default: "text",
@@ -44,7 +74,14 @@ defmodule Elemental.Input do
   attr :value,
        :string,
        default: nil,
-       doc: "The value of the input."
+       doc: """
+       The value of the input.
+
+       ## Value per type
+
+       #{@textual_types_value_documentation}
+       #{@ordinal_types_value_documentation}
+       """
 
   attr :color,
        :string,
@@ -56,7 +93,7 @@ defmodule Elemental.Input do
        :string,
        required: false,
        values: daisy_sizes(),
-       doc: "The input's size."
+       doc: "The input's size class to use."
 
   attr :class,
        :string,
@@ -66,6 +103,152 @@ defmodule Elemental.Input do
   attr :rest,
        :global,
        doc: "Pass arbitrary attributes over to the input"
+
+  # Additional attributes for each specific input type
+  # ignored for types that don't use it.
+
+  attr :checked,
+       :boolean,
+       default: nil,
+       doc: "The checked flag for checkboxes and radios."
+
+  attr :list,
+       :string,
+       default: nil,
+       doc: """
+       The values of the list attribute is the `id` of a `<datalist>`
+       element located in the same document.
+       """
+
+  attr :max,
+       :string,
+       default: nil,
+       doc: """
+       The maximum value allowed for types that support it.
+
+       If both the `max` and `min` attributes are set, this value must
+       greater than or equal to the `min` attribute.
+
+       ## Value per type
+
+       #{@ordinal_types_value_documentation}
+
+       > Invalid values imply no `max` value.
+       """
+
+  attr :maxlength,
+       :string,
+       default: nil,
+       doc: """
+       The maximum string length (measured in UTF-16 code units) that the user can
+       enter into the input. This must be an integer value of 0 or higher. If no
+       `maxlength` is specified, or an invalid value is specified, the input
+       has no maximum length. This value must also be greater than or equal
+       to the value of `minlength`.
+       """
+
+  attr :min,
+       :string,
+       default: nil,
+       doc: """
+       The maximum value allowed for types that support it.
+
+       If both the `max` and `min` attributes are set, this value must
+       less than or equal to the `min` attribute.
+
+       ## Value per type
+
+       #{@ordinal_types_value_documentation}
+
+       > Invalid values imply no `min` value.
+       """
+
+  attr :minlength,
+       :string,
+       default: nil,
+       doc: """
+       The minimum string length (measured in UTF-16 code units) that the user can
+       enter into the input. This must be a non-negative integer value smaller
+       than or equal to the value specified by `maxlength`. If no `minlength`
+       is specified, or an invalid value is specified, the input has no
+       minimum length.
+       """
+
+  attr :multiple,
+       :boolean,
+       default: nil,
+       doc: """
+       A Boolean attribute which, if present, indicates that the user can enter a
+       list of multiple values, separated by commas and, optionally, whitespace
+       characters.
+       """
+
+  attr :pattern,
+       :string,
+       default: nil,
+       doc: """
+       A regular expression that the input's value must match for the value to pass
+       constraint validation. It must be a valid JavaScript regular expression.
+       """
+
+  attr :placeholder,
+       :string,
+       default: nil,
+       doc: """
+       A string that provides a brief hint to the user as to what kind of
+       information is expected in the field.
+
+       > The text _must_ not include carriage returns or line feeds.
+       """
+
+  attr :readonly,
+       :boolean,
+       default: nil,
+       doc: "If present, means this field cannot be edited by the user."
+
+  attr :step,
+       :string,
+       default: nil,
+       doc: """
+       The step value which specifies the number for the granularity
+       of the step or the special value `any`, allowed for types
+       that support it.
+
+       ## Values per type
+
+       - `date` - given in days; and is treated as a number of milliseconds
+         equal to 86,400,000 times the `step` value (the underlying numeric
+         value is in milliseconds). The default value of `step` is 1,
+         indicating 1 day.
+       - `datetime-local` - given in seconds, with a scaling factor of 1000
+         (since the underlying numeric value is in milliseconds). The
+         default value of `step` is 60, indicating 60 seconds (or
+         1 minute, or 60,000 milliseconds).
+       - `month` - given in months, with a scaling factor of 1 (since the underlying
+         numeric value is also in months). The default value of step is 1 month.
+       - `number` - a valid number; the default stepping value for number
+         inputs is 1, allowing only integers to be entered—_unless_ the
+         stepping base is not an integer.
+       - `range` - a valid number; the default stepping value for number
+         inputs is 1, allowing only integers to be entered—_unless_ the
+         stepping base is not an integer.
+       - `time` - given in seconds, with a scaling factor of 1000 (since
+         the underlying numeric value is in milliseconds). The default
+         value of step is 60, indicating 60 seconds (or 1 minute,
+         or 60,000 milliseconds).
+       - `week` - given in weeks, with a scaling factor of 604,800,000
+         (since the underlying numeric value is in milliseconds).
+         The default value of step is 1, indicating 1 week.
+
+       > Note: When the data entered by the user doesn't adhere to the stepping configuration, the user agent may round to the nearest valid value, preferring numbers in the positive direction when there are two equally close options.
+
+       ## `any` value
+
+       - A string value of any means that no stepping is implied, and any value
+         is allowed (barring other constraints, such as `min` and `max`).
+       - Specifying `any` as the value for `step` has the same effect as 1 for
+         `date` inputs.
+       """
 
   @doc """
   > A simple abstraction on top of basic HTML input.
@@ -92,7 +275,24 @@ defmodule Elemental.Input do
       |> maybe_randomize_name()
 
     ~H"""
-    <input type={@type} class={[@component, @class]} name={@name} value={@value} {@rest} />
+    <input
+      type={@type}
+      class={[@component, @class]}
+      name={@name}
+      value={@value}
+      checked={@checked}
+      list={@list}
+      max={@max}
+      maxlength={@maxlength}
+      min={@min}
+      minlength={@minlength}
+      multiple={@multiple}
+      pattern={@pattern}
+      placeholder={@placeholder}
+      readonly={@readonly}
+      step={@step}
+      {@rest}
+    />
     """
   end
 
@@ -105,6 +305,11 @@ defmodule Elemental.Input do
        :string,
        default: nil,
        doc: "The value of the checkbox."
+
+  attr :checked,
+       :boolean,
+       default: nil,
+       doc: "The checked flag for checkboxes and radios."
 
   attr :color,
        :string,
@@ -143,6 +348,11 @@ defmodule Elemental.Input do
        :string,
        default: nil,
        doc: "The value of the checkbox."
+
+  attr :checked,
+       :boolean,
+       default: nil,
+       doc: "The checked flag for checkboxes and radios."
 
   attr :color,
        :string,

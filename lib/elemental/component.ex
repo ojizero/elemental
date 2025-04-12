@@ -6,7 +6,7 @@ defmodule Elemental.Component do
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
-      use Phoenix.Component
+      use Phoenix.Component, global_prefixes: ~w(elemental-)
       use PhoenixHTMLHelpers
 
       import Elemental.Component
