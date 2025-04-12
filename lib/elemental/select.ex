@@ -72,20 +72,17 @@ defmodule Elemental.Select do
        default: nil,
        doc: "Additional CSS classes to pass to the select."
 
+  attr :rest, :global
+
   @doc "> The primary select component."
   def select(assigns) do
-    assigns = maybe_randomized_name(assigns)
+    assigns =
+      assigns
+      |> assign(:component, component(assigns))
+      |> maybe_randomized_name()
 
     ~H"""
-    <select
-      class={[
-        "select",
-        assigns[:color] && "select-#{@color}",
-        assigns[:size] && "select-#{@size}",
-        @class
-      ]}
-      name={@name}
-    >
+    <select class={[@component, @class]} name={@name}>
       <option :if={@prompt} value="" disabled selected={prompt_selected?(assigns)}>{@prompt}</option>
       {Phoenix.HTML.Form.options_for_select(@options, @value)}
     </select>
@@ -100,5 +97,16 @@ defmodule Elemental.Select do
       end)
 
     value not in values
+  end
+
+  @doc false
+  def component(%{"elemental-disable-styles": true} = _assigns), do: []
+
+  def component(assigns) do
+    [
+      "select",
+      assigns[:color] && "select-#{assigns.color}",
+      assigns[:size] && "select-#{assigns.size}"
+    ]
   end
 end

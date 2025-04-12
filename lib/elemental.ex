@@ -54,9 +54,10 @@ defmodule Elemental do
   def __using__(_opts \\ []) do
     quote do
       import Elemental.Breadcrumbs
-      import Elemental.Dropdown
+      import Elemental.Dropdown, except: [component: 1]
+      import Elemental.Input, except: [component: 1]
       import Elemental.Loading
-      import Elemental.Select
+      import Elemental.Select, except: [component: 1]
       import Elemental.Table
       import Elemental.Tooltip
     end

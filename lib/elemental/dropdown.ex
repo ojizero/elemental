@@ -49,7 +49,7 @@ defmodule Elemental.Dropdown do
 
   use Elemental.Component
 
-  import Elemental.Input
+  alias Elemental.Input
 
   attr :options,
        :list,
@@ -179,6 +179,8 @@ defmodule Elemental.Dropdown do
        the "visible"/"interactive" bit of the dropdown.
        """
 
+  attr :rest, :global
+
   @doc """
   > The primary dropdown component.
 
@@ -210,17 +212,7 @@ defmodule Elemental.Dropdown do
         @open && "dropdown-open"
       ]}
     >
-      <div
-        id={@name <> "__prompt_container"}
-        tabindex="0"
-        role="button"
-        class={[
-          "select overflow-scroll m-1 gap-1",
-          assigns[:color] && "select-#{@color}",
-          assigns[:size] && "select-#{@size}",
-          @class
-        ]}
-      >
+      <div id={@name <> "__prompt_container"} tabindex="0" role="button" class={[@component, @class]}>
         <.dropdown_prompt
           name={@name}
           value={@value}
@@ -300,7 +292,7 @@ defmodule Elemental.Dropdown do
     ~H"""
     <li elemental-label={@label} elemental-item-id={@id}>
       <label>
-        <.input
+        <Input.input
           id={@id}
           type={item_type(assigns)}
           name={item_name(assigns)}
@@ -325,7 +317,7 @@ defmodule Elemental.Dropdown do
 
   defp dropdown_search(assigns) do
     ~H"""
-    <.input
+    <Input.input
       id={@id}
       type="search"
       name={@name}
@@ -340,6 +332,7 @@ defmodule Elemental.Dropdown do
 
   defp normalize_assigns(assigns) do
     assigns
+    |> assign(:component, component(assigns))
     |> maybe_randomized_name()
     |> normalize_options()
     |> normalize_value()
@@ -391,4 +384,15 @@ defmodule Elemental.Dropdown do
 
   defp default_prompt_element_id(%{name: name}),
     do: name <> "__default_prompt"
+
+  @doc false
+  def component(%{"elemental-disable-styles": true} = _assigns), do: []
+
+  def component(assigns) do
+    [
+      "select overflow-scroll m-1 gap-1",
+      assigns[:color] && "select-#{assigns.color}",
+      assigns[:size] && "select-#{assigns.size}"
+    ]
+  end
 end
