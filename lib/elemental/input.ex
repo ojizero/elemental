@@ -384,40 +384,40 @@ defmodule Elemental.Input do
   end
 
   defp normalize(assigns) do
-    assign(assigns, :component, component(assigns))
+    assign(assigns, :component, component_classes(assigns))
   end
 
   @doc false
-  def component(%{"elemental-disable-styles": true} = _assigns),
+  def component_classes(%{"elemental-disable-styles": true} = _assigns),
     # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
     do: ["focus:border-primary", "focus:outline-none"]
 
-  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns),
+  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns),
     # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
     do: ["focus:border-primary", "focus:outline-none"]
 
-  def component(%{type: "checkbox"} = assigns),
+  def component_classes(%{type: "checkbox"} = assigns),
     do: ["checkbox" | class_modifiers("checkbox", assigns)]
 
-  def component(%{type: "file"} = assigns),
+  def component_classes(%{type: "file"} = assigns),
     do: ["file-input" | class_modifiers("file-input", assigns)]
 
   # Is it redundant and bad to return the class `hidden` here?
-  def component(%{type: "hidden"} = _assigns),
+  def component_classes(%{type: "hidden"} = _assigns),
     do: ["hidden"]
 
-  def component(%{type: "range"} = assigns),
+  def component_classes(%{type: "range"} = assigns),
     do: ["range", class_modifiers("range", assigns)]
 
-  def component(%{type: "radio"} = assigns),
+  def component_classes(%{type: "radio"} = assigns),
     do: ["radio" | class_modifiers("radio", assigns)]
 
   # Left blank as Daisy has no styles for it
-  def component(%{type: type} = _assigns)
+  def component_classes(%{type: type} = _assigns)
       when type in ~w(color image hidden),
       do: []
 
-  def component(assigns),
+  def component_classes(assigns),
     do: ["input" | class_modifiers("input", assigns)]
 
   defp class_modifiers(class, assigns) do

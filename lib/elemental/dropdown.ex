@@ -212,7 +212,7 @@ defmodule Elemental.Dropdown do
         @open && "dropdown-open"
       ]}
     >
-      <div id={@name <> "__prompt_container"} tabindex="0" role="button" class={[@component, @class]}>
+      <div id={@name <> "__prompt_container"} tabindex="0" role="button" class={classes(assigns)}>
         <.dropdown_prompt
           name={@name}
           value={@value}
@@ -332,7 +332,6 @@ defmodule Elemental.Dropdown do
 
   defp normalize_assigns(assigns) do
     assigns
-    |> assign(:component, component(assigns))
     |> maybe_randomized_name()
     |> normalize_options()
     |> normalize_value()
@@ -386,10 +385,10 @@ defmodule Elemental.Dropdown do
     do: name <> "__default_prompt"
 
   @doc false
-  def component(%{"elemental-disable-styles": true} = _assigns), do: []
-  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
+  def component_classes(%{"elemental-disable-styles": true} = _assigns), do: []
+  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
 
-  def component(assigns) do
+  def component_classes(assigns) do
     [
       "select overflow-scroll m-1 gap-1",
       assigns[:color] && "select-#{assigns.color}",

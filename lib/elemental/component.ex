@@ -10,8 +10,30 @@ defmodule Elemental.Component do
       use PhoenixHTMLHelpers
 
       import Elemental.Component
+
+      @doc false
+      def classes(assigns),
+        do: Elemental.Component.classes(__MODULE__, assigns)
+
+      @doc false
+      def component_classes(assigns), do: []
+
+      defoverridable component_classes: 1
     end
   end
+
+  @doc false
+  def classes(_mod, %{"elemental-disable-styles": true} = _assigns),
+    do: []
+
+  def classes(_mod, %{rest: %{"elemental-disable-styles": true}} = _assigns),
+    do: []
+
+  def classes(mod, assigns),
+    do: [mod.component_classes(assigns), class_attr(assigns)]
+
+  defp class_attr(%{class: class}), do: class
+  defp class_attr(%{rest: %{class: class}}), do: class
 
   @doc false
   # We treat "ghost" style as a color

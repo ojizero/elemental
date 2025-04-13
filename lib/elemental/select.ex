@@ -78,7 +78,7 @@ defmodule Elemental.Select do
   def select(assigns) do
     assigns =
       assigns
-      |> assign(:component, component(assigns))
+      |> assign(:component, component_classes(assigns))
       |> maybe_randomized_name()
 
     ~H"""
@@ -100,10 +100,10 @@ defmodule Elemental.Select do
   end
 
   @doc false
-  def component(%{"elemental-disable-styles": true} = _assigns), do: []
-  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
+  def component_classes(%{"elemental-disable-styles": true} = _assigns), do: []
+  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
 
-  def component(assigns) do
+  def component_classes(assigns) do
     [
       "select",
       assigns[:color] && "select-#{assigns.color}",

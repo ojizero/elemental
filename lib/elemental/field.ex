@@ -116,9 +116,10 @@ defmodule Elemental.Field do
   def field(assigns) do
     assigns = normalize_assigns(assigns) |> IO.inspect(label: :assigns)
 
+    # TODO: cleanup validator component
     ~H"""
     <div>
-      <label class={[component(assigns), "validator"]}>
+      <label class={[classes(assigns), "validator"]}>
         <.overlay :for={element <- @start_edge} element={element} />
         <.overlay :for={element <- @start_center} element={element} />
         <.wrapped_component {cleanup_assigns(assigns)} />
@@ -145,14 +146,18 @@ defmodule Elemental.Field do
   defp wrapped_component(assigns),
     do: ~H"<Input.input {assigns} elemental-disable-styles />"
 
-  defp component(%{type: "select"} = assigns), do: Select.component(assigns)
-  defp component(%{type: "dropdown"} = assigns), do: Dropdown.component(assigns)
+  @doc false
+  def component_classes(%{type: "select"} = assigns), do: Select.component_classes(assigns)
+  def component_classes(%{type: "dropdown"} = assigns), do: Dropdown.component_classes(assigns)
 
-  defp component(%{type: type} = _assigns)
-       when type in ~w(checkbox color radio range),
-       do: ["input"]
+  def component_classes(%{type: type} = assigns)
+      when type in ~w(checkbox color radio range) do
+    assigns
+    |> assign(:type, "text")
+    |> Input.component_classes()
+  end
 
-  defp component(assigns), do: Input.component(assigns)
+  def component_classes(assigns), do: Input.component_classes(assigns)
 
   defp overlay(%{element: %{__slot__: :label}} = assigns),
     do: ~H[<span class="label">{@element.value}</span>]

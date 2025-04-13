@@ -126,7 +126,7 @@ defmodule Elemental.Button do
   def button(%{href: _href} = assigns) do
     ~H"""
     <.link
-      class={component(assigns)}
+      class={classes(assigns)}
       href={@href}
       replace={@replace}
       method={@method}
@@ -141,7 +141,7 @@ defmodule Elemental.Button do
   def button(%{navigate: _navigate} = assigns) do
     ~H"""
     <.link
-      class={component(assigns)}
+      class={classes(assigns)}
       navigate={@navigate}
       replace={@replace}
       method={@method}
@@ -156,7 +156,7 @@ defmodule Elemental.Button do
   def button(%{patch: _patch} = assigns) do
     ~H"""
     <.link
-      class={component(assigns)}
+      class={classes(assigns)}
       patch={@patch}
       replace={@replace}
       method={@method}
@@ -170,17 +170,17 @@ defmodule Elemental.Button do
 
   def button(assigns) do
     ~H"""
-    <button class={component(assigns)} {@rest}>
+    <button class={classes(assigns)} {@rest}>
       {render_slot(@inner_block)}
     </button>
     """
   end
 
   @doc false
-  def component(%{"elemental-disable-styles": true} = _assigns), do: []
-  def component(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
+  def component_classes(%{"elemental-disable-styles": true} = _assigns), do: []
+  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
 
-  def component(assigns) do
+  def component_classes(assigns) do
     [
       "btn",
       assigns[:color] && "btn-#{assigns.color}",
