@@ -95,12 +95,10 @@ export const ElementalDropdownSingleItem = {
     document.getElementById(displayId).classList.remove("hidden")
   },
 
-  // Close the prompt by removing focus from it, this is based
-  // on how the dropdown is implemented.
   closeDropdown() {
-    const contentId = this.el.getAttribute("elemental-hook-content-id")
+    const contentId = this.el.getAttribute("elemental-hook-container-id")
     const contentEl = document.getElementById(contentId)
-    contentEl.blur()
+    contentEl.removeAttribute("open")
   }
 }
 

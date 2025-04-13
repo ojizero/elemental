@@ -202,7 +202,7 @@ defmodule Elemental.Dropdown do
     assigns = normalize_assigns(assigns)
 
     ~H"""
-    <div
+    <details
       id={@name <> "__container"}
       class={[
         "dropdown",
@@ -211,8 +211,9 @@ defmodule Elemental.Dropdown do
         @hover && "dropdown-hover",
         @open && "dropdown-open"
       ]}
+      phx-click-away={JS.remove_attribute("open")}
     >
-      <div id={@name <> "__prompt_container"} tabindex="0" role="button" class={classes(assigns)}>
+      <summary id={@name <> "__prompt_container"} class={classes(assigns)}>
         <.dropdown_prompt
           name={@name}
           value={@value}
@@ -227,10 +228,9 @@ defmodule Elemental.Dropdown do
           placeholder={@prompt}
           filterable_content_id={@name <> "__content"}
         />
-      </div>
+      </summary>
       <ul
         id={@name <> "__content"}
-        tabindex="0"
         class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
       >
         <.dropdown_search
@@ -248,12 +248,12 @@ defmodule Elemental.Dropdown do
           value={value}
           multi={@multi}
           selected={value in @value}
-          content_element_id={@name <> "__content"}
+          container_element_id={@name <> "__container"}
           default_prompt_element_id={default_prompt_element_id(assigns)}
           prompt_container_element_id={@name <> "__prompt_container"}
         />
       </ul>
-    </div>
+    </details>
     """
   end
 
@@ -284,7 +284,7 @@ defmodule Elemental.Dropdown do
   attr :value, :string, required: true
   attr :multi, :boolean, required: true
   attr :selected, :boolean, required: true
-  attr :content_element_id, :string, required: true
+  attr :container_element_id, :string, required: true
   attr :default_prompt_element_id, :string, required: true
   attr :prompt_container_element_id, :string, required: true
 
@@ -300,7 +300,7 @@ defmodule Elemental.Dropdown do
           checked={@selected}
           hidden={not @multi}
           phx-hook={phx_hook(assigns)}
-          elemental-hook-content-id={@content_element_id}
+          elemental-hook-container-id={@container_element_id}
           elemental-hook-default-prompt-id={@default_prompt_element_id}
           elemental-hook-prompt-container-id={@prompt_container_element_id}
         />

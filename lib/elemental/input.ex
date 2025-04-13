@@ -269,15 +269,12 @@ defmodule Elemental.Input do
   instead of the `file` type.
   """
   def input(assigns) do
-    assigns =
-      assigns
-      |> normalize()
-      |> maybe_randomized_name()
+    assigns = maybe_randomized_name(assigns)
 
     ~H"""
     <input
       type={@type}
-      class={[@component, @class]}
+      class={classes(assigns)}
       name={@name}
       value={@value}
       checked={@checked}
@@ -380,10 +377,6 @@ defmodule Elemental.Input do
     assigns
     |> assign(:type, "radio")
     |> input()
-  end
-
-  defp normalize(assigns) do
-    assign(assigns, :component, component_classes(assigns))
   end
 
   @doc false

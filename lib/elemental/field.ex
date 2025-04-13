@@ -52,6 +52,7 @@ defmodule Elemental.Field do
 
   alias Elemental.Input
   alias Elemental.Select
+  alias Elemental.Button
   alias Elemental.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
@@ -131,8 +132,16 @@ defmodule Elemental.Field do
 
   attr :validator,
        :boolean,
-       default: true,
-       doc: "Enables validator component on the field."
+       required: false,
+       doc: """
+       Enables validator component on the field.
+
+       ## Types
+
+       - `dropdown` - disabled by default
+       - `select` - disabled by default
+       - Other types enabled by default
+       """
 
   ## Shared attributes
 
@@ -293,7 +302,7 @@ defmodule Elemental.Field do
     # TODO: cleanup validator component
     ~H"""
     <div>
-      <label class={classes(assigns)}>
+      <label class={classes(assigns)} for={if @type == "dropdown", do: "#{@name}__hidden_trigger"}>
         <.overlay :for={slot <- @start_edge} slot={slot} />
         <.overlay :for={slot <- @start_center} slot={slot} />
         <.wrapped_component {cleanup_assigns(assigns)} />
@@ -310,8 +319,25 @@ defmodule Elemental.Field do
   defp wrapped_component(%{type: "select"} = assigns),
     do: ~H"<Select.select {assigns} elemental-disable-styles />"
 
-  defp wrapped_component(%{type: "dropdown"} = assigns),
-    do: ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
+  defp wrapped_component(%{type: "dropdown"} = assigns) do
+    # Relying on internal knowledge we can focus on the prompt using a
+    # hidden input, this allows binding the label to the dropdown.
+    ~H"""
+    <Button.button
+      id={"#{@name}__hidden_trigger"}
+      type="button"
+      class="hidden"
+      elemental-disable-styles
+      phx-click={
+        JS.toggle_attribute({"open", "true"},
+          to: "\##{Phoenix.HTML.css_escape(@name)}__container"
+        )
+      }
+    >
+    </Button.button>
+    <Dropdown.dropdown {assigns} elemental-disable-styles />
+    """
+  end
 
   defp wrapped_component(%{type: type} = assigns)
        when type in ~w(checkbox color radio range),
@@ -371,6 +397,11 @@ defmodule Elemental.Field do
     |> normalize_slots()
     |> assign_new(:errors, fn -> [] end)
     |> assign(:error_translator, assigns[:"error-translator"])
+    |> assign_new(:validator, fn
+      %{type: "dropdown"} -> false
+      %{type: "select"} -> false
+      _otherwise -> true
+    end)
   end
 
   defp normalize_slots(assigns) do

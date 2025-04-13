@@ -11,6 +11,8 @@ defmodule Elemental.Component do
 
       import Elemental.Component
 
+      alias Phoenix.LiveView.JS
+
       @doc false
       def classes(assigns),
         do: Elemental.Component.classes(__MODULE__, assigns)
