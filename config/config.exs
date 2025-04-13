@@ -1,23 +1,30 @@
 import Config
 
-config :tailwind,
-  version: "4.1.0",
-  elemental: [
-    args: ~w(
-      --input=assets/css/elemental.css
-      --output=priv/static/assets/elemental.css
-    ),
-    cd: Path.expand("..", __DIR__)
-  ]
+config :elemental_storybook,
+  generators: [timestamp_type: :utc_datetime]
 
-config :esbuild,
-  version: "0.25.0",
-  elemental: [
-    args: ~w(
-      assets/js/hooks/index.js
-      --bundle
-      --sourcemap=inline
-      --outdir=priv/static/assets/hooks
-    ),
-    cd: Path.expand("..", __DIR__)
-  ]
+# Configures the endpoint
+config :elemental_storybook, ElementalStorybookWeb.Endpoint,
+  url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
+  render_errors: [
+    formats: [html: ElementalStorybookWeb.ErrorHTML, json: ElementalStorybookWeb.ErrorJSON],
+    layout: false
+  ],
+  pubsub_server: ElementalStorybook.PubSub,
+  live_view: [signing_salt: "UwlmdZcr"]
+
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
+
+config :phoenix, :json_library, Jason
+
+config :elemental, Storybook,
+  compilation_mode: :lazy,
+  compilation_debug: true
+
+import_config "assets_config.exs"
+
+if config_env() in ~w(dev prod)a,
+  do: import_config("#{config_env()}.exs")

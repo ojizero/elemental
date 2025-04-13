@@ -1,13 +1,6 @@
 @import "tailwindcss";
 
-/* assets */
-@source "../../";
-/* storybook */
-@source "../../../";
-/* elemetnal from deps */
-@source "../../../deps/elemental";
-/* elemetnal from path */
-@source "../../../../";
+@source inline("../../../../");
 
 /* Enforce light mode here for now, main focus is functionality not storybook's theming */
 @plugin "../vendor/daisyui" {

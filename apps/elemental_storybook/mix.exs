@@ -9,7 +9,12 @@ defmodule ElementalStorybook.MixProject do
       version: "0.2.0",
       elixir: "~> 1.17",
       elixirc_paths: ~w(lib),
-      start_permanent: Mix.env() == :prod
+      start_permanent: Mix.env() == :prod,
+      # Umbrella configs
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs"
     ]
   end
 
@@ -31,26 +36,16 @@ defmodule ElementalStorybook.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      # {:elemental, "~> 0.1"}
-      {:elemental, path: "../"}
+      {:elemental, in_umbrella: true}
     ]
   end
 
   defp aliases do
     [
-      setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": [
-        "tailwind storybook",
-        "esbuild storybook",
-        "tailwind elemental_storybook",
-        "esbuild elemental_storybook"
-      ],
+      "assets.build": ["tailwind storybook", "esbuild storybook"],
       "assets.deploy": [
         "tailwind storybook --minify",
         "esbuild storybook --minify",
-        "tailwind elemental_storybook --minify",
-        "esbuild elemental_storybook --minify",
         "phx.digest"
       ]
     ]
