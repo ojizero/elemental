@@ -5,7 +5,17 @@ defmodule Elemental.Storybook.MyPage do
 
   def doc, do: "A Tailwind and DaisyUI based Phoenix components library."
 
-  def render(assigns) do
+  def navigation do
+    [
+      {:welcome, "Welcome", {:fa, "hand-wave", :thin}},
+      {:components, "Components", {:fa, "toolbox", :thin}},
+      {:sandboxing, "Sandboxing", {:fa, "box-check", :thin}},
+      {:icons, "Icons", {:fa, "icons", :thin}}
+    ]
+  end
+
+
+  def render(%{tab: :welcome}=assigns) do
     ~H"""
     <div class="psb-welcome-page">
       <p>
