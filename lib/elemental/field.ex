@@ -4,33 +4,6 @@ defmodule Elemental.Field do
   `Elemental.Select`, provide a wrapped component that easy to
   and decorate as needed.
 
-  an input with overlay, consider merging dropdown/select into it
-
-  <.input type="type" /> <- simplest
-
-  If overlay slot if given
-    -> wrap it all in label
-    -> style goes to label
-    -> input has now no style
-
-  <.field type="type">
-    <:overlay placement="right|left">
-      Allow things on top of the element
-      https://daisyui.com/components/input/#text-input-with-text-label-inside
-    </:overlay>
-    <:overlay placement="right|left">
-      Allow things on top of the element
-      https://daisyui.com/components/input/#text-input-with-text-label-inside
-    </:overlay>
-  </.field>
-
-  How to label? Label component ideally should be just that, a label
-  however doing the above means it's better be a span inside the
-  input, which won't fly as a just label. Check how label
-  behaves in isolation to decide.
-
-  See how all this plays with the made select and dropdown and those
-  can integrate here (or if they should be just dumped here instead)
   """
 
   use Elemental.Component
@@ -39,11 +12,7 @@ defmodule Elemental.Field do
   alias Elemental.Select
   alias Elemental.Dropdown
 
-  # TODO: cleanup implementation and test it out
   # TODO: ensure error with defined class works, else use `text-error`
-  # TODO: label/overlay rename position to align to match daisy naming
-  # TODO: label/overlay rename placement to from to match daisy naming
-  # TODO: support floating labels ?
 
   attr :type,
        :string,
@@ -61,55 +30,164 @@ defmodule Elemental.Field do
        - Any value supported by `Elemental.Input.input/1`.
        """
 
-  #  If for is given name, value, and errors are ignored
-  attr :for, Phoenix.HTML.FormField
-  attr :name, :string
-  attr :value, :any
-  attr :errors, :list
+  attr :for,
+       Phoenix.HTML.FormField,
+       required: false,
+       doc: """
+       Allows for more seamless integration into Elixir forms, used to
+       determine the `name`, `value`, and `errors` fields when
+       building the field.
 
-  # TODO: other values from all components
+       > If set the fields `name`, `value`, and `errors` are **ignored**.
+       """
+
+  attr :name,
+       :string,
+       required: false,
+       doc: """
+       The name of the field, if not given a random value is selected.
+
+       > **Ignored** of `for` attribute is set.
+       """
+
+  attr :value,
+       :any,
+       required: false,
+       doc: """
+       The value of the field, must either be a string or a list of string.
+
+       > **Ignored** of `for` attribute is set.
+
+       ## Types
+
+       - `dropdown` - as defined in `Element.Dropdown.dropdown/1`
+       - `select` - as defined in `Element.Select.select/1`
+       - Otherwise as defined in `Element.Input.input/1`
+       """
+
+  attr :errors,
+       :list,
+       default: [],
+       doc: """
+       A list of errors to render in the field, these values will be passed
+       through the `error-translator` attribute.
+
+       > **Ignored** of `for` attribute is set.
+       """
 
   attr :"error-translator",
        {:fun, 1},
        default: &Function.identity/1,
-       doc: ""
+       doc: """
+       A function of single arity used to allow errors to be translated
+       by consumer. Defaults to `Function.identity/1`.
+
+       Translator must return a string, or other HTML safe values as an outcome
+       as the result will be rendered inside a `<span>`.
+       """
+
+  ## Shared attributes
+
+  attr :color, :string, required: false, values: daisy_colors(), doc: "The fields's color."
+  attr :size, :string, required: false, values: daisy_sizes(), doc: "The fields's size."
+  attr :class, :string, default: nil, doc: "Additional CSS classes to pass to the field."
+
+  ## Dropdown only attributes
+
+  attr :multi, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+  attr :searchable, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+  attr :"searchable-inline", :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+  attr :hover, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+  attr :open, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+
+  attr :align, :string,
+    default: "start",
+    values: ~w(start center end),
+    doc: "See `Elemental.Dropdown.dropdown/1`."
+
+  attr :from, :string,
+    default: "bottom",
+    values: ~w(top bottom left right),
+    doc: "See `Elemental.Dropdown.dropdown/1`."
+
+  ## Input only attributes
+
+  attr :checked, :boolean, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :list, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :max, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :maxlength, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :min, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :minlength, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :pattern, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :placeholder, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :readonly, :boolean, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :step, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+
+  ## Dropdown and input shared attributes
+
+  attr :multiple, :boolean,
+    required: false,
+    doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Input.input/1`."
+
+  ## Dropdown and select shared attributes
+
+  attr :prompt, :string,
+    default: nil,
+    doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Select.select/1`."
 
   slot :overlay,
     doc: """
+    Allows for inserting inner components that make up the `field`,
+    useful for labeling or other customizations around the
+    field itself.
     """ do
-    attr :position,
+    attr :align,
          :string,
          values: ~w(start end),
-         doc: """
-         """
+         doc: "Alignment of the label, defaults to `start`."
 
-    attr :placement,
+    attr :from,
          :string,
          values: ~w(edge center),
          doc: """
+         The placement of the label relative to other overlays, defaults to `center`.
          """
   end
 
   slot :label,
     doc: """
+    A shorthand for `overlay`s meant for labeling, changes defaults
+    and simplifies things by defaulting the label class.
+
+    Effectively a shorthand for;
+
+        <:overlay>
+          <span class="label">{@value}</span>
+        </:overlay>
     """ do
     attr :value,
          :string,
          required: true,
-         doc: ""
+         doc: "The value to display in the label."
 
-    attr :position,
+    attr :align,
          :string,
          values: ~w(start end),
-         doc: """
-         """
+         doc: "Alignment of the label, defaults to `start`."
 
-    attr :placement,
+    attr :from,
          :string,
          values: ~w(edge center),
          doc: """
+         The placement of the label relative to other overlays, defaults to `edge`.
          """
   end
+
+  attr :rest, :global, doc: false
+
+  @doc """
+  """
+  def field(assigns)
 
   def field(%{for: %Phoenix.HTML.FormField{name: name, value: value} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
@@ -123,17 +201,17 @@ defmodule Elemental.Field do
   end
 
   def field(assigns) do
-    assigns = normalize_assigns(assigns) |> IO.inspect(label: :assigns)
+    assigns = normalize_assigns(assigns)
 
     # TODO: cleanup validator component
     ~H"""
     <div>
       <label class={[classes(assigns), "validator"]}>
-        <.overlay :for={element <- @start_edge} element={element} />
-        <.overlay :for={element <- @start_center} element={element} />
+        <.overlay :for={slot <- @start_edge} slot={slot} />
+        <.overlay :for={slot <- @start_center} slot={slot} />
         <.wrapped_component {cleanup_assigns(assigns)} />
-        <.overlay :for={element <- @end_center} element={element} />
-        <.overlay :for={element <- @end_edge} element={element} />
+        <.overlay :for={slot <- @end_center} slot={slot} />
+        <.overlay :for={slot <- @end_edge} slot={slot} />
       </label>
       <span :for={error <- @errors} class="hidden validator-hint">
         {@error_translator.(error)}
@@ -168,14 +246,11 @@ defmodule Elemental.Field do
 
   def component_classes(assigns), do: Input.component_classes(assigns)
 
-  defp overlay(%{element: %{__slot__: :label}} = assigns),
-    do: ~H[<span class="label">{@element.value}</span>]
+  defp overlay(%{slot: %{__slot__: :label}} = assigns),
+    do: ~H[<span class="label">{@slot.value}</span>]
 
-  defp overlay(%{element: %{__slot__: :overlay}} = assigns),
-    do: ~H"{render_slot(@element)}"
-
-  defp overlay(%{element: fun} = assigns) when is_function(fun, 1),
-    do: fun.(assigns)
+  defp overlay(%{slot: %{__slot__: :overlay}} = assigns),
+    do: ~H"{render_slot(@slot)}"
 
   defp normalize_assigns(assigns) do
     assigns
@@ -192,44 +267,48 @@ defmodule Elemental.Field do
     |> assign_overlay_elements(:start_center, "start", "center")
     |> assign_overlay_elements(:end_center, "end", "center")
     |> assign_overlay_elements(:end_edge, "end", "edge")
-    |> Map.delete(:label)
-    |> Map.delete(:overlay)
   end
 
   defp assign_slots_defaults(assigns) do
     assigns
-    |> overlay_elements()
-    # TODO: set default values here
-    |> IO.inspect(label: :alloverflow)
-
-    assigns
+    |> update(:label, fn labels ->
+      Enum.map(labels, fn label ->
+        label
+        |> Map.put_new(:align, "start")
+        |> Map.put_new(:from, "edge")
+      end)
+    end)
+    |> update(:overlay, fn overlays ->
+      Enum.map(overlays, fn overlay ->
+        overlay
+        |> Map.put_new(:align, "start")
+        |> Map.put_new(:from, "center")
+      end)
+    end)
   end
 
-  defp assign_overlay_elements(assigns, key, position, placement) do
+  defp assign_overlay_elements(assigns, key, align, from) do
     assigns
     |> overlay_elements()
-    |> Enum.filter(fn el ->
-      el.position == position and el.placement == placement
-    end)
-    # |> Enum.map(fn el ->
-    #   fn assigns ->
-    #     assigns = assign(assigns, :element, el)
-    #     ~H"<.overlay element={@element} />"
-    #   end
-    # end)
-    |> then(fn elements ->
-      assign(assigns, key, elements)
-    end)
+    |> Enum.filter(fn el -> el.align == align and el.from == from end)
+    |> then(fn elements -> assign(assigns, key, elements) end)
   end
 
   defp overlay_elements(%{label: labels, overlay: overlays}),
     do: Enum.concat(labels, overlays)
 
+  # Slots aren't HTML safe to pass, same with functions,
+  # this is the simplest workaround I can think of,
+  # while keeping features set and external API.
   defp cleanup_assigns(assigns) do
     assigns
+    |> Map.delete(:label)
+    |> Map.delete(:overlay)
     |> Map.delete(:start_edge)
     |> Map.delete(:start_center)
     |> Map.delete(:end_center)
     |> Map.delete(:end_edge)
+    |> Map.delete(:"error-translator")
+    |> Map.delete(:error_translator)
   end
 end

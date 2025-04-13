@@ -34,6 +34,7 @@ defmodule Elemental.Component do
 
   defp class_attr(%{class: class}), do: class
   defp class_attr(%{rest: %{class: class}}), do: class
+  defp class_attr(_assigns), do: []
 
   @doc false
   # We treat "ghost" style as a color

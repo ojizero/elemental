@@ -273,7 +273,6 @@ defmodule Elemental.Input do
       assigns
       |> normalize()
       |> maybe_randomized_name()
-      |> IO.inspect(label: :assigns)
 
     ~H"""
     <input
