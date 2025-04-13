@@ -4,6 +4,48 @@ defmodule Elemental.Field do
   `Elemental.Select`, provide a wrapped component that easy to
   and decorate as needed.
 
+  ## Usage
+
+      <.field /> # simple text input as a field
+      <.field type="dropdown" prompt="My prompt" /> # now it's a prompt
+
+  Fields are mostly intended for use with forms, and they offer  simple
+  integration (similar to Phoenix' generated core components);
+
+      <.form for={@form} phx-change="change" phx-submit="submit">
+        <.field for={@form[:my_field]} type="dropdown" prompt="My prompt" />
+      </.form>
+
+  Labels can be provided to a field as slots configuring them;
+
+      # A text field with a label
+      <.field>
+        <:label value="My label"/>
+      </.field>
+      # Labels can be place at the end of the field too
+      <.field>
+        <:label value="My label" align="end"/>
+      </.field>
+
+  More complex patterns are supported using "overlays", an overlay
+  is HTML passed externally into the component;
+
+      <.field type="email" placeholder="email@example.org">
+        <:overlay>
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></g></svg>
+        </:overlay>
+      </.field>
+
+  ## Implementation
+
+  The input itself is rendered within a `<label>` element and wrapped
+  with configurable overlays allowing for external customizability.
+  Details on overlay documentation and overall field structure
+  see `Elemental.Field.field/1`.
+
+  All attributes defined in `Elemental.Input.input/1`, `Elemental.Dropdown.dropdown/1`,
+  and `Elemental.Select.select/1` are supported by fields and are just passed
+  over to their respective implementation.
   """
 
   use Elemental.Component
@@ -186,6 +228,40 @@ defmodule Elemental.Field do
   attr :rest, :global, doc: false
 
   @doc """
+  > The primary form field component.
+
+  This component wraps `Elemental.Input`, `Elemental.Dropdown`, and
+  `Elemental.Select`  in a label and offers simplified
+  customizability and form integration.
+
+  The component can be configured via overlays passed as slots from
+  the external consumers of it. Overlays allow for inserting
+  HTML element to customize the field.
+
+  ## Structure
+
+  The general structure of the render HTML follows
+
+      <div>
+        <label class="component classes">
+          <!-- Overlays defined as align="start" from="edge" -->
+          <!-- Overlays defined as align="start" from="center" -->
+          <!-- The actual field, be it input, dropdown, or select -->
+          <!-- Overlays defined as align="end" from="center" -->
+          <!-- Overlays defined as align="end" from="edge" -->
+        </label>
+        <span :for={error <- @errors} class="hidden validator-hint">{error}</span>
+      </div>
+
+  Overlays are rendered in the order they appear in the `align`/`from`
+  position configured for them, labels are treated the same as
+  overlays are follow the same rules.
+
+  > Labels are nothing more than a shorthand helper for overlays that;
+  >
+  > 1. They have different defaults for `align` and `from`.
+  > 1. They don't allow for arbitrary HTML and always render the given value
+  >    in a `<span>` element with appropriate styling.
   """
   def field(assigns)
 
@@ -297,9 +373,9 @@ defmodule Elemental.Field do
   defp overlay_elements(%{label: labels, overlay: overlays}),
     do: Enum.concat(labels, overlays)
 
-  # Slots aren't HTML safe to pass, same with functions,
-  # this is the simplest workaround I can think of,
-  # while keeping features set and external API.
+  # Slots aren't HTML safe to pass, same with functions, this is
+  # the simplest workaround I can think of, while keeping
+  # features set and external API simple.
   defp cleanup_assigns(assigns) do
     assigns
     |> Map.delete(:label)
