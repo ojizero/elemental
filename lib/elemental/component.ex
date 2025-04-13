@@ -26,11 +26,11 @@ defmodule Elemental.Component do
   end
 
   @doc false
-  def classes(mod, %{"elemental-disable-styles": true} = _assigns),
-    do: mod.empty_classes()
+  def classes(mod, %{"elemental-disable-styles": true} = assigns),
+    do: [mod.empty_classes(), class_attr(assigns)]
 
-  def classes(mod, %{rest: %{"elemental-disable-styles": true}} = _assigns),
-    do: mod.empty_classes()
+  def classes(mod, %{rest: %{"elemental-disable-styles": true}} = assigns),
+    do: [mod.empty_classes(), class_attr(assigns)]
 
   def classes(mod, assigns),
     do: [mod.component_classes(assigns), class_attr(assigns)]

@@ -55,7 +55,7 @@ defmodule Elemental.Field do
   alias Elemental.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
-  # TODO: unbreak styles for dropdown...
+  # TODO: fix dropdown behaviour -- label doesn't trigger it
 
   attr :type,
        :string,
@@ -335,8 +335,20 @@ defmodule Elemental.Field do
   defp wrapped_component_classes(%{type: "select"} = assigns),
     do: Select.component_classes(assigns)
 
-  defp wrapped_component_classes(%{type: "dropdown"} = assigns),
-    do: Dropdown.component_classes(assigns)
+  defp wrapped_component_classes(%{type: "dropdown"} = assigns) do
+    # This is specific to dropdown to cleanup it's style and
+    # make it usable since the scroll behaviour is for
+    # inner badges and not for the field.
+    classes_to_remove = Dropdown.empty_classes()
+
+    assigns
+    |> Dropdown.component_classes()
+    |> IO.inspect(label: :classes)
+    |> Enum.map(fn
+      nil -> nil
+      classes -> String.replace(classes, classes_to_remove, "")
+    end)
+  end
 
   defp wrapped_component_classes(%{type: type} = assigns)
        when type in ~w(checkbox color radio range) do
