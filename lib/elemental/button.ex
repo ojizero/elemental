@@ -56,9 +56,10 @@ defmodule Elemental.Button do
        required: false,
        doc: ""
 
-  attr :rest, :global
-
-  slot :inner_block, required: true
+  attr :type,
+       :string,
+       default: nil,
+       doc: "The button type, this is ignored if `href` is passed."
 
   attr :href,
        :string,
@@ -113,6 +114,10 @@ defmodule Elemental.Button do
 
        > See `Phoenix.Component.link/1` for details.
        """
+
+  attr :rest, :global
+
+  slot :inner_block, required: true
 
   @doc """
   > The primary button component.
@@ -170,7 +175,7 @@ defmodule Elemental.Button do
 
   def button(assigns) do
     ~H"""
-    <button class={classes(assigns)} {@rest}>
+    <button class={classes(assigns)} type={@type} {@rest}>
       {render_slot(@inner_block)}
     </button>
     """
