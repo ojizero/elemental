@@ -37,19 +37,18 @@ defmodule Elemental.Field do
 
   alias Elemental.Input
   alias Elemental.Select
-  alias Elemental.Button
   alias Elemental.Dropdown
 
-  # TODO: add inner block for button (or otherwise pass value)
-  # TODO: support floating labels
-  # TODO: error display
+  # TODO: support floating labels ?
+  # TODO: ensure error with defined class works, else use `text-error`
+  # TODO: cleanup implementation and test it out
 
   attr :type,
        :string,
        default: "text",
        values: ~w(checkbox color date datetime-local email file hidden image
                  month number password radio range search tel text time url
-                 week dropdown select button),
+                 week dropdown select),
        doc: """
        > The form field's type.
 
@@ -57,9 +56,13 @@ defmodule Elemental.Field do
 
        - `dropdown` powered by `Elemental.Dropdown.dropdown/1`.
        - `select` powered by `Elemental.Select.select/1`.
-       - `button` powered by `Elemental.Button.button/1`.
        - Any value supported by `Elemental.Input.input/1`.
        """
+
+  attr :"error-translator",
+       {:fun, 1},
+       default: &Function.identity/1,
+       doc: ""
 
   slot :overlay,
     doc: """
@@ -98,33 +101,39 @@ defmodule Elemental.Field do
          """
   end
 
-  # TODO: rename to input_field or user_input?
+  def field(%{for: %Phoenix.HTML.FormField{} = field} = assigns) do
+    errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
-  def field(%{for: %Phoenix.HTML.FormField{}} = assigns) do
-    # TODO:
-    ~H"""
-    """
+    assigns
+    |> assign(for: nil, id: assigns.id || field.id)
+    # |> assign(:errors, Enum.map(errors, &translate_error(&1)))
+    |> assign(:errors, errors)
+    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
+    |> assign_new(:value, fn -> field.value end)
+    |> field()
   end
 
   def field(assigns) do
     assigns = normalize_assigns(assigns) |> IO.inspect(label: :assigns)
 
     ~H"""
-    <label class={[component(assigns), "validator"]}>
-      <.overlay :for={element <- @start_edge} element={element} />
-      <.overlay :for={element <- @start_center} element={element} />
-      <.wrapped_component {cleanup_assigns(assigns)} />
-      <.overlay :for={element <- @end_center} element={element} />
-      <.overlay :for={element <- @end_edge} element={element} />
-    </label>
+    <div>
+      <label class={[component(assigns), "validator"]}>
+        <.overlay :for={element <- @start_edge} element={element} />
+        <.overlay :for={element <- @start_center} element={element} />
+        <.wrapped_component {cleanup_assigns(assigns)} />
+        <.overlay :for={element <- @end_center} element={element} />
+        <.overlay :for={element <- @end_edge} element={element} />
+      </label>
+      <span :for={error <- @errors} class="hidden validator-hint">
+        {@error_translator.(error)}
+      </span>
+    </div>
     """
   end
 
   defp wrapped_component(%{type: "select"} = assigns),
     do: ~H"<Select.select {assigns} elemental-disable-styles />"
-
-  defp wrapped_component(%{type: "button"} = assigns),
-    do: ~H"<Button.button {assigns} elemental-disable-styles></Button.button>"
 
   defp wrapped_component(%{type: "dropdown"} = assigns),
     do: ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
@@ -137,7 +146,6 @@ defmodule Elemental.Field do
     do: ~H"<Input.input {assigns} elemental-disable-styles />"
 
   defp component(%{type: "select"} = assigns), do: Select.component(assigns)
-  defp component(%{type: "button"} = assigns), do: Button.component(assigns)
   defp component(%{type: "dropdown"} = assigns), do: Dropdown.component(assigns)
 
   defp component(%{type: type} = _assigns)
@@ -159,6 +167,8 @@ defmodule Elemental.Field do
     assigns
     |> maybe_randomized_name()
     |> normalize_slots()
+    |> assign_new(:errors, fn -> [] end)
+    |> assign(:error_translator, assigns[:"error-translator"])
   end
 
   defp normalize_slots(assigns) do
@@ -175,6 +185,7 @@ defmodule Elemental.Field do
   defp assign_slots_defaults(assigns) do
     assigns
     |> overlay_elements()
+    # TODO: set default values here
     |> IO.inspect(label: :alloverflow)
 
     assigns
