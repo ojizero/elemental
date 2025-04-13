@@ -385,9 +385,6 @@ defmodule Elemental.Dropdown do
     do: name <> "__default_prompt"
 
   @doc false
-  def component_classes(%{"elemental-disable-styles": true} = _assigns), do: []
-  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
-
   def component_classes(assigns) do
     [
       "select overflow-scroll m-1 gap-1",
@@ -395,4 +392,7 @@ defmodule Elemental.Dropdown do
       assigns[:size] && "select-#{assigns.size}"
     ]
   end
+
+  @doc false
+  def empty_classes, do: "overflow-scroll m-1 gap-1"
 end

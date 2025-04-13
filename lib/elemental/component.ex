@@ -18,16 +18,19 @@ defmodule Elemental.Component do
       @doc false
       def component_classes(assigns), do: []
 
-      defoverridable component_classes: 1
+      @doc false
+      def empty_classes, do: []
+
+      defoverridable component_classes: 1, empty_classes: 0
     end
   end
 
   @doc false
-  def classes(_mod, %{"elemental-disable-styles": true} = _assigns),
-    do: []
+  def classes(mod, %{"elemental-disable-styles": true} = _assigns),
+    do: mod.empty_classes()
 
-  def classes(_mod, %{rest: %{"elemental-disable-styles": true}} = _assigns),
-    do: []
+  def classes(mod, %{rest: %{"elemental-disable-styles": true}} = _assigns),
+    do: mod.empty_classes()
 
   def classes(mod, assigns),
     do: [mod.component_classes(assigns), class_attr(assigns)]

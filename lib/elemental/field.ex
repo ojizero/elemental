@@ -55,6 +55,7 @@ defmodule Elemental.Field do
   alias Elemental.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
+  # TODO: unbreak styles for dropdown...
 
   attr :type,
        :string,
@@ -128,6 +129,11 @@ defmodule Elemental.Field do
        as the result will be rendered inside a `<span>`.
        """
 
+  attr :validator,
+       :boolean,
+       default: true,
+       doc: "Enables validator component on the field."
+
   ## Shared attributes
 
   attr :color, :string, required: false, values: daisy_colors(), doc: "The fields's color."
@@ -172,6 +178,11 @@ defmodule Elemental.Field do
     doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Input.input/1`."
 
   ## Dropdown and select shared attributes
+
+  attr :options,
+       :list,
+       required: false,
+       doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Select.select/1`."
 
   attr :prompt, :string,
     default: nil,
@@ -225,7 +236,7 @@ defmodule Elemental.Field do
          """
   end
 
-  attr :rest, :global, doc: false
+  # attr :rest, :global, doc: false
 
   @doc """
   > The primary form field component.
@@ -282,7 +293,7 @@ defmodule Elemental.Field do
     # TODO: cleanup validator component
     ~H"""
     <div>
-      <label class={[classes(assigns), "validator"]}>
+      <label class={classes(assigns)}>
         <.overlay :for={slot <- @start_edge} slot={slot} />
         <.overlay :for={slot <- @start_center} slot={slot} />
         <.wrapped_component {cleanup_assigns(assigns)} />
@@ -314,17 +325,27 @@ defmodule Elemental.Field do
   end
 
   @doc false
-  def component_classes(%{type: "select"} = assigns), do: Select.component_classes(assigns)
-  def component_classes(%{type: "dropdown"} = assigns), do: Dropdown.component_classes(assigns)
+  def component_classes(assigns) do
+    [
+      wrapped_component_classes(assigns),
+      assigns.validator && "validator"
+    ]
+  end
 
-  def component_classes(%{type: type} = assigns)
-      when type in ~w(checkbox color radio range) do
+  defp wrapped_component_classes(%{type: "select"} = assigns),
+    do: Select.component_classes(assigns)
+
+  defp wrapped_component_classes(%{type: "dropdown"} = assigns),
+    do: Dropdown.component_classes(assigns)
+
+  defp wrapped_component_classes(%{type: type} = assigns)
+       when type in ~w(checkbox color radio range) do
     assigns
     |> assign(:type, "text")
     |> Input.component_classes()
   end
 
-  def component_classes(assigns), do: Input.component_classes(assigns)
+  defp wrapped_component_classes(assigns), do: Input.component_classes(assigns)
 
   defp overlay(%{slot: %{__slot__: :label}} = assigns),
     do: ~H[<span class="label">{@slot.value}</span>]
