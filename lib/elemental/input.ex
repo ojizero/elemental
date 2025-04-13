@@ -387,14 +387,6 @@ defmodule Elemental.Input do
   end
 
   @doc false
-  def component_classes(%{"elemental-disable-styles": true} = _assigns),
-    # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
-    do: ["focus:border-primary", "focus:outline-none"]
-
-  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns),
-    # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
-    do: ["focus:border-primary", "focus:outline-none"]
-
   def component_classes(%{type: "checkbox"} = assigns),
     do: ["checkbox" | class_modifiers("checkbox", assigns)]
 

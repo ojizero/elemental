@@ -306,8 +306,12 @@ defmodule Elemental.Field do
        when type in ~w(checkbox color radio range),
        do: ~H"<Input.input {assigns} />"
 
-  defp wrapped_component(assigns),
-    do: ~H"<Input.input {assigns} elemental-disable-styles />"
+  defp wrapped_component(assigns) do
+    # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
+    ~H"""
+    <Input.input {assigns} class="focus:border-primary focus:outline-none" elemental-disable-styles />
+    """
+  end
 
   @doc false
   def component_classes(%{type: "select"} = assigns), do: Select.component_classes(assigns)
