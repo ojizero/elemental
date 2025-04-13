@@ -264,11 +264,11 @@ defmodule Elemental.Field do
 
       <div>
         <label class="component classes">
-          <!-- Overlays defined as align="start" from="edge" -->
-          <!-- Overlays defined as align="start" from="center" -->
-          <!-- The actual field, be it input, dropdown, or select -->
-          <!-- Overlays defined as align="end" from="center" -->
-          <!-- Overlays defined as align="end" from="edge" -->
+          <%# Overlays defined as align="start" from="edge" %>
+          <%# Overlays defined as align="start" from="center" %>
+          <%# The actual field, be it input, dropdown, or select %>
+          <%# Overlays defined as align="end" from="center" %>
+          <%# Overlays defined as align="end" from="edge" %>
         </label>
         <span :for={error <- @errors} class="hidden validator-hint">{error}</span>
       </div>
