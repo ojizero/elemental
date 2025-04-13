@@ -27,6 +27,10 @@ export const ElementalDropdownSearch = {
     const contentId = this.el.getAttribute("elemental-hook-filterable-content-id")
     const contentEl = document.getElementById(contentId)
     this.el.oninput = debounce(() => this.filterSibling(contentEl), 100)
+
+    const containerId = this.el.getAttribute("elemental-hook-container-id")
+    const containerEl = document.getElementById(containerId)
+    this.el.onclick = () => containerEl.setAttribute("open", true)
   },
 
   filterSibling(contentEl) {

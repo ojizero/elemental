@@ -226,6 +226,7 @@ defmodule Elemental.Dropdown do
           id={@name <> "__search"}
           name={@name <> "__search"}
           placeholder={@prompt}
+          container_element_id={@name <> "__container"}
           filterable_content_id={@name <> "__content"}
         />
       </summary>
@@ -238,6 +239,7 @@ defmodule Elemental.Dropdown do
           id={@name <> "__search"}
           name={@name <> "__search"}
           placeholder="Search"
+          container_element_id={@name <> "__container"}
           filterable_content_id={@name <> "__content"}
         />
         <.dropdown_item
@@ -313,6 +315,7 @@ defmodule Elemental.Dropdown do
   attr :id, :string, required: true
   attr :name, :string, required: true
   attr :placeholder, :string, required: true
+  attr :container_element_id, :string, required: true
   attr :filterable_content_id, :string, required: true
 
   defp dropdown_search(assigns) do
@@ -322,9 +325,10 @@ defmodule Elemental.Dropdown do
       type="search"
       name={@name}
       color="ghost"
-      class="border-1 m-1"
+      class="border-1 m-1 focus:outline-none"
       placeholder={@placeholder}
       phx-hook="ElementalDropdownSearch"
+      elemental-hook-container-id={@container_element_id}
       elemental-hook-filterable-content-id={@filterable_content_id}
     />
     """
