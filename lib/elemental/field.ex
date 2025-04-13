@@ -39,9 +39,11 @@ defmodule Elemental.Field do
   alias Elemental.Select
   alias Elemental.Dropdown
 
-  # TODO: support floating labels ?
-  # TODO: ensure error with defined class works, else use `text-error`
   # TODO: cleanup implementation and test it out
+  # TODO: ensure error with defined class works, else use `text-error`
+  # TODO: label/overlay rename position to align to match daisy naming
+  # TODO: label/overlay rename placement to from to match daisy naming
+  # TODO: support floating labels ?
 
   attr :type,
        :string,
@@ -58,6 +60,14 @@ defmodule Elemental.Field do
        - `select` powered by `Elemental.Select.select/1`.
        - Any value supported by `Elemental.Input.input/1`.
        """
+
+  #  If for is given name, value, and errors are ignored
+  attr :for, Phoenix.HTML.FormField
+  attr :name, :string
+  attr :value, :any
+  attr :errors, :list
+
+  # TODO: other values from all components
 
   attr :"error-translator",
        {:fun, 1},
@@ -101,15 +111,14 @@ defmodule Elemental.Field do
          """
   end
 
-  def field(%{for: %Phoenix.HTML.FormField{} = field} = assigns) do
+  def field(%{for: %Phoenix.HTML.FormField{name: name, value: value} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
     assigns
     |> assign(for: nil, id: assigns.id || field.id)
-    # |> assign(:errors, Enum.map(errors, &translate_error(&1)))
     |> assign(:errors, errors)
-    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
-    |> assign_new(:value, fn -> field.value end)
+    |> assign(:name, name)
+    |> assign(:value, value)
     |> field()
   end
 
