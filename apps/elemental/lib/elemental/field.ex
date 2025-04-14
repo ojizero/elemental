@@ -131,18 +131,10 @@ defmodule Elemental.Field do
        as the result will be rendered inside a `<span>`.
        """
 
-  attr :validator,
+  attr :"disable-validator",
        :boolean,
-       required: false,
-       doc: """
-       Enables validator component on the field.
-
-       ## Types
-
-       - `dropdown` - disabled by default
-       - `select` - disabled by default
-       - Other types enabled by default
-       """
+       default: false,
+       doc: "Disables the validator component on the field."
 
   ## Shared attributes
 
@@ -380,10 +372,8 @@ defmodule Elemental.Field do
     |> normalize_slots()
     |> assign_new(:errors, fn -> [] end)
     |> assign(:error_translator, assigns[:"error-translator"])
-    |> assign_new(:validator, fn
-      %{type: "dropdown"} -> false
-      %{type: "select"} -> false
-      _otherwise -> true
+    |> assign_new(:validator, fn %{"disable-validator": disable_validator} ->
+      not disable_validator
     end)
   end
 
