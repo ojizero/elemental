@@ -52,7 +52,6 @@ defmodule Elemental.Field do
 
   alias Elemental.Input
   alias Elemental.Select
-  alias Elemental.Button
   alias Elemental.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
@@ -302,7 +301,7 @@ defmodule Elemental.Field do
     # TODO: cleanup validator component
     ~H"""
     <div>
-      <label class={classes(assigns)} for={if @type == "dropdown", do: "#{@name}__hidden_trigger"}>
+      <label class={classes(assigns)}>
         <.overlay :for={slot <- @start_edge} slot={slot} />
         <.overlay :for={slot <- @start_center} slot={slot} />
         <.wrapped_component {cleanup_assigns(assigns)} />
@@ -319,25 +318,8 @@ defmodule Elemental.Field do
   defp wrapped_component(%{type: "select"} = assigns),
     do: ~H"<Select.select {assigns} elemental-disable-styles />"
 
-  defp wrapped_component(%{type: "dropdown"} = assigns) do
-    # Relying on internal knowledge we can focus on the prompt using a
-    # hidden input, this allows binding the label to the dropdown.
-    ~H"""
-    <Button.button
-      id={"#{@name}__hidden_trigger"}
-      type="button"
-      class="hidden"
-      elemental-disable-styles
-      phx-click={
-        JS.toggle_attribute({"open", "true"},
-          to: "\##{Phoenix.HTML.css_escape(@name)}__container"
-        )
-      }
-    >
-    </Button.button>
-    <Dropdown.dropdown {assigns} elemental-disable-styles />
-    """
-  end
+  defp wrapped_component(%{type: "dropdown"} = assigns),
+    do: ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
 
   defp wrapped_component(%{type: type} = assigns)
        when type in ~w(checkbox color radio range),

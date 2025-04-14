@@ -50,6 +50,7 @@ defmodule Elemental.Dropdown do
   use Elemental.Component
 
   alias Elemental.Input
+  alias Elemental.Button
 
   attr :options,
        :list,
@@ -180,6 +181,15 @@ defmodule Elemental.Dropdown do
        """
 
   attr :rest, :global
+  # Passed outside of rest to simplify access and defaulting it
+  # not documented as it's a "global" attribute and we wanna
+  # treat it as such.
+  #
+  # ID is passed over to a hidden trigger (button) to allow simplified
+  # binding + more correct behaviour with labels, ID itself is passed
+  # there to also simplify/streamline behaviour when triggering it
+  # programmatically if need be (makes it similar to other inputs)
+  attr :id, :string, required: false, doc: false
 
   @doc """
   > The primary dropdown component.
@@ -202,60 +212,74 @@ defmodule Elemental.Dropdown do
     assigns = normalize_assigns(assigns)
 
     ~H"""
-    <details
-      id={@name <> "__container"}
-      class={[
-        "dropdown",
-        "dropdown-#{@align}",
-        "dropdown-#{@from}",
-        @hover && "dropdown-hover",
-        @open && "dropdown-open"
-      ]}
-      phx-click-away={JS.remove_attribute("open")}
-    >
-      <summary id={@name <> "__prompt_container"} class={classes(assigns)}>
-        <.dropdown_prompt
-          name={@name}
-          value={@value}
-          multi={@multi}
-          prompt={unless @searchable and @inline_search, do: @prompt}
-          options={@options}
-        />
-        <.dropdown_search
-          :if={@searchable and @inline_search}
-          id={@name <> "__search"}
-          name={@name <> "__search"}
-          placeholder={@prompt}
-          container_element_id={@name <> "__container"}
-          filterable_content_id={@name <> "__content"}
-        />
-      </summary>
-      <ul
-        id={@name <> "__content"}
-        class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
+    <div>
+      <Button.button
+        id={@id}
+        type="button"
+        class="hidden"
+        elemental-disable-styles
+        phx-click={
+          JS.toggle_attribute({"open", "true"},
+            to: "\##{Phoenix.HTML.css_escape("#{@name}__container")}"
+          )
+        }
       >
-        <.dropdown_search
-          :if={@searchable and not @inline_search}
-          id={@name <> "__search"}
-          name={@name <> "__search"}
-          placeholder="Search"
-          container_element_id={@name <> "__container"}
-          filterable_content_id={@name <> "__content"}
-        />
-        <.dropdown_item
-          :for={{{label, value}, index} <- Enum.with_index(@options)}
-          id={@name <> "__item_#{index}"}
-          name={@name}
-          label={label}
-          value={value}
-          multi={@multi}
-          selected={value in @value}
-          container_element_id={@name <> "__container"}
-          default_prompt_element_id={default_prompt_element_id(assigns)}
-          prompt_container_element_id={@name <> "__prompt_container"}
-        />
-      </ul>
-    </details>
+      </Button.button>
+      <details
+        id={@name <> "__container"}
+        class={[
+          "dropdown",
+          "dropdown-#{@align}",
+          "dropdown-#{@from}",
+          @hover && "dropdown-hover",
+          @open && "dropdown-open"
+        ]}
+        phx-click-away={JS.remove_attribute("open")}
+      >
+        <summary id={@name <> "__prompt_container"} class={classes(assigns)}>
+          <.dropdown_prompt
+            name={@name}
+            value={@value}
+            multi={@multi}
+            prompt={unless @searchable and @inline_search, do: @prompt}
+            options={@options}
+          />
+          <.dropdown_search
+            :if={@searchable and @inline_search}
+            id={@name <> "__search"}
+            name={@name <> "__search"}
+            placeholder={@prompt}
+            container_element_id={@name <> "__container"}
+            filterable_content_id={@name <> "__content"}
+          />
+        </summary>
+        <ul
+          id={@name <> "__content"}
+          class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
+        >
+          <.dropdown_search
+            :if={@searchable and not @inline_search}
+            id={@name <> "__search"}
+            name={@name <> "__search"}
+            placeholder="Search"
+            container_element_id={@name <> "__container"}
+            filterable_content_id={@name <> "__content"}
+          />
+          <.dropdown_item
+            :for={{{label, value}, index} <- Enum.with_index(@options)}
+            id={@name <> "__item_#{index}"}
+            name={@name}
+            label={label}
+            value={value}
+            multi={@multi}
+            selected={value in @value}
+            container_element_id={@name <> "__container"}
+            default_prompt_element_id={default_prompt_element_id(assigns)}
+            prompt_container_element_id={@name <> "__prompt_container"}
+          />
+        </ul>
+      </details>
+    </div>
     """
   end
 
@@ -337,6 +361,7 @@ defmodule Elemental.Dropdown do
   defp normalize_assigns(assigns) do
     assigns
     |> maybe_randomized_name()
+    |> assign_new(:id, fn %{name: name} -> name end)
     |> normalize_options()
     |> normalize_value()
     |> normalize_search_props()
