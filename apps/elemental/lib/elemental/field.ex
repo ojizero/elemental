@@ -55,7 +55,8 @@ defmodule Elemental.Field do
   alias Elemental.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
-  # TODO: fix dropdown behaviour -- label doesn't trigger it
+  # TODO: fix select behaviour
+  #       -> label doesn't trigger the button (or the button doesn't load the hook)
 
   attr :type,
        :string,
@@ -77,8 +78,9 @@ defmodule Elemental.Field do
        Phoenix.HTML.FormField,
        required: false,
        doc: """
-       Allows for more seamless integration into Elixir forms, used to
-       determine the `name`, `value`, and `errors` fields when
+       Allows for more seamless integration into Elixir forms.
+
+       Used to determine the `name`, `value`, and `errors` fields when
        building the field.
 
        > If set the fields `name`, `value`, and `errors` are **ignored**.
@@ -351,7 +353,6 @@ defmodule Elemental.Field do
 
     assigns
     |> Dropdown.component_classes()
-    |> IO.inspect(label: :classes)
     |> Enum.map(fn
       nil -> nil
       classes -> String.replace(classes, classes_to_remove, "")
