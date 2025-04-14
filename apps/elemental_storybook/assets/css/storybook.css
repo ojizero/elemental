@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
-@source inline("../../../../");
-
 /* Enforce light mode here for now, main focus is functionality not storybook's theming */
 @plugin "../vendor/daisyui" {
   themes: light --default
 }
 
-/* Temporary to allow colors in storybook */
-/* TODO: update storybook to safelist everything + remove from here */
-/* @source inline("text-{accent,error,info,neutral,primary,secondary,success,warning}"); */
-/* @source inline("hidden"); */
+@source "../../../../";
+/* Workaround until I adjust to how Tailwind does treeshaking */
+@source inline("text-{accent,error,info,neutral,primary,secondary,success,warning}");
+@source inline("bg-{accent,error,info,neutral,primary,secondary,success,warning}");
+@source inline("bg-{accent,error,info,neutral,primary,secondary,success,warning}-content");
