@@ -17,6 +17,8 @@ defmodule Elemental.Select do
 
   use Elemental.Component
 
+  alias Elemental.Button
+
   attr :options,
        :list,
        required: true,
@@ -73,6 +75,7 @@ defmodule Elemental.Select do
        doc: "Additional CSS classes to pass to the select."
 
   attr :rest, :global
+  attr :id, :string, required: false, doc: false
 
   @doc "> The primary select component."
   def select(assigns) do
@@ -80,12 +83,25 @@ defmodule Elemental.Select do
       assigns
       |> assign(:component, component_classes(assigns))
       |> maybe_randomized_name()
+      |> assign_new(:id, fn %{name: name} -> name end)
 
     ~H"""
-    <select class={[@component, @class]} name={@name}>
-      <option :if={@prompt} value="" disabled selected={prompt_selected?(assigns)}>{@prompt}</option>
-      {Phoenix.HTML.Form.options_for_select(@options, @value)}
-    </select>
+    <div>
+      <Button.button
+        id={@id}
+        type="button"
+        class="hidden"
+        elemental-disable-styles
+        phx-hook="ElementalSelectLabelAdapter"
+      >
+      </Button.button>
+      <select class={classes(assigns)} id={@id <> "__select"} name={@name}>
+        <option :if={@prompt} value="" disabled selected={prompt_selected?(assigns)}>
+          {@prompt}
+        </option>
+        {Phoenix.HTML.Form.options_for_select(@options, @value)}
+      </select>
+    </div>
     """
   end
 
@@ -100,9 +116,6 @@ defmodule Elemental.Select do
   end
 
   @doc false
-  def component_classes(%{"elemental-disable-styles": true} = _assigns), do: []
-  def component_classes(%{rest: %{"elemental-disable-styles": true}} = _assigns), do: []
-
   def component_classes(assigns) do
     [
       "select",

@@ -12,7 +12,7 @@ config :elemental_storybook, ElementalStorybookWeb.Endpoint,
   ],
   live_reload: [
     patterns: [
-      ~r"../lib/elemental/.*(ex|heex)$",
+      ~r"../lib/elemental/.*(ex|heex|js|css)$",
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$"
     ]
   ]
