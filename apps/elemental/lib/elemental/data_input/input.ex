@@ -1,10 +1,10 @@
-defmodule Elemental.Input do
+defmodule Elemental.DataInput.Input do
   @moduledoc """
   > An abstraction on top of HTML's input element.
 
   This only concerns itself with being a building block core component and
   directly abstracts `input` HTML element. For more sophisticated usage
-  you may want to look at `Elemental.Field` which provides a more
+  you may want to look at `Elemental.DataInput.Field` which provides a more
   complete complex component for easier to use/build forms.
 
   ## Usage
@@ -63,7 +63,7 @@ defmodule Elemental.Input do
 
        While we support `button`, `reset`, and `submit` types, those are
        more for completeness and are not recommended for use per MDN
-       recommendations, prefer the use `Elemental.Button` instead.
+       recommendations, prefer the use `Elemental.Actions.Button` instead.
        """
 
   attr :name,
@@ -257,13 +257,13 @@ defmodule Elemental.Input do
   as a building block for other Elemental components to use.
 
   For complex use-cases with forms and other variants of inputs
-  you may want to visit `Elemental.Field.field/1` component
+  you may want to visit `Elemental.DataInput.Field.field/1` component
   which provides additional features tailored for forms.
 
   ## Type related notes
 
   Types of `button`, `reset`, and `submit` are omitted from supported
-  types, for button usages use `Elemental.Button.button/1` instead.
+  types, for button usages use `Elemental.Actions.Button.button/1` instead.
 
   For live file uploads, see `Phoenix.Component.live_file_input/1`
   instead of the `file` type.

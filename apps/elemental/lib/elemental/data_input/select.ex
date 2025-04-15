@@ -1,9 +1,9 @@
-defmodule Elemental.Select do
+defmodule Elemental.DataInput.Select do
   @moduledoc """
   > An abstraction on top of DaisyUI's (& plain HTML) select.
 
   This abstracts native HTML selects providing an API that is compatible
-  1-1 with `Elemental.Dropdown` aiming to provide consistency between
+  1-1 with `Elemental.DataInput.Dropdown` aiming to provide consistency between
   the main/core input components provided by Elemental.
 
   ## Usage
@@ -17,7 +17,7 @@ defmodule Elemental.Select do
 
   use Elemental.Component
 
-  alias Elemental.Button
+  alias Elemental.Actions.Button
 
   attr :options,
        :list,

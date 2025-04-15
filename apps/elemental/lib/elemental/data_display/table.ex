@@ -1,4 +1,4 @@
-defmodule Elemental.Table do
+defmodule Elemental.DataDisplay.Table do
   @moduledoc "> Tabular data display components."
 
   use Elemental.Component

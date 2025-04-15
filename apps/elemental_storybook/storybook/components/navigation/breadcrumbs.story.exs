@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Breadcrumbs do
+defmodule Elemental.Storybook.Components.Navigation.Breadcrumbs do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Breadcrumbs.breadcrumbs/1
+  def function, do: &Elemental.Navigation.Breadcrumbs.breadcrumbs/1
 
   def variations do
     [

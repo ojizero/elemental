@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Field do
+defmodule Elemental.Storybook.Components.DataInput.Field do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Field.field/1
+  def function, do: &Elemental.DataInput.Field.field/1
 
   def variations do
     [

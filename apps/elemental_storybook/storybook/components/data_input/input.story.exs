@@ -1,10 +1,10 @@
-defmodule Elemental.Storybook.Components.Input do
+defmodule Elemental.Storybook.Components.DataInput.Input do
   use PhoenixStorybook.Story, :component
 
   @input_types ~w(checkbox color date datetime-local email file hidden image month
                   number password radio range search tel text time url week)
 
-  def function, do: &Elemental.Input.input/1
+  def function, do: &Elemental.DataInput.Input.input/1
 
   def variations do
     [

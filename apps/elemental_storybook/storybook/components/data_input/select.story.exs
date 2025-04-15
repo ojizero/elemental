@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Select do
+defmodule Elemental.Storybook.Components.DataInput.Select do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Select.select/1
+  def function, do: &Elemental.DataInput.Select.select/1
 
   def variations do
     [

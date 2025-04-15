@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Loading do
+defmodule Elemental.Storybook.Components.Feedback.Loading do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Loading.loading/1
+  def function, do: &Elemental.Feedback.Loading.loading/1
 
   def variations do
     [

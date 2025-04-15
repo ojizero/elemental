@@ -1,8 +1,11 @@
-defmodule Elemental.Dropdown do
+# TODO: "dropdowns" are classified as "actions" in Daisy docs
+#       however this dropdown is more of a "dropdown-select"
+#       should we rename it instead?
+defmodule Elemental.DataInput.Dropdown do
   @moduledoc """
   > An abstraction around DaisyUI's dropdown.
 
-  Think of it as a more advanced `Elemental.Select` with support for
+  Think of it as a more advanced `Elemental.DataInput.Select` with support for
   multi-select and searching out of the box.
 
   This is implement in a manner that works drop-in in forms and uses
@@ -49,8 +52,8 @@ defmodule Elemental.Dropdown do
 
   use Elemental.Component
 
-  alias Elemental.Input
-  alias Elemental.Button
+  alias Elemental.DataInput.Input
+  alias Elemental.Actions.Button
 
   attr :options,
        :list,
@@ -199,12 +202,12 @@ defmodule Elemental.Dropdown do
   of the box.
 
   > The API provided here works drop-in with Elemental's select
-  > component (see `Elemental.Select`).
+  > component (see `Elemental.DataInput.Select`).
 
   ## Select compatibility
 
   While this component provides 1-1 API compatibility the the more simpler
-  `Elemental.Select.select/1`, augmenting it with additional features
+  `Elemental.DataInput.Select.select/1`, augmenting it with additional features
   and interactivity, there's the caveat that it does not yet
   support option groups.
   """

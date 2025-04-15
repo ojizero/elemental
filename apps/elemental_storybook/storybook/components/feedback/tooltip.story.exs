@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Tooltip do
+defmodule Elemental.Storybook.Components.Feedback.Tooltip do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Tooltip.tooltip/1
+  def function, do: &Elemental.Feedback.Tooltip.tooltip/1
 
   def variations do
     [

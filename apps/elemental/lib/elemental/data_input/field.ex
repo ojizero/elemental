@@ -1,7 +1,7 @@
-defmodule Elemental.Field do
+defmodule Elemental.DataInput.Field do
   @moduledoc """
-  Building on top of `Elemental.Input`, `Elemental.Dropdown`, and
-  `Elemental.Select`, provide a wrapped component that easy to
+  Building on top of `Elemental.DataInput.Input`, `Elemental.DataInput.Dropdown`, and
+  `Elemental.DataInput.Select`, provide a wrapped component that easy to
   and decorate as needed.
 
   ## Usage
@@ -41,18 +41,18 @@ defmodule Elemental.Field do
   The input itself is rendered within a `<label>` element and wrapped
   with configurable overlays allowing for external customizability.
   Details on overlay documentation and overall field structure
-  see `Elemental.Field.field/1`.
+  see `Elemental.DataInput.Field.field/1`.
 
-  All attributes defined in `Elemental.Input.input/1`, `Elemental.Dropdown.dropdown/1`,
-  and `Elemental.Select.select/1` are supported by fields and are just passed
+  All attributes defined in `Elemental.DataInput.Input.input/1`, `Elemental.DataInput.Dropdown.dropdown/1`,
+  and `Elemental.DataInput.Select.select/1` are supported by fields and are just passed
   over to their respective implementation.
   """
 
   use Elemental.Component
 
-  alias Elemental.Input
-  alias Elemental.Select
-  alias Elemental.Dropdown
+  alias Elemental.DataInput.Input
+  alias Elemental.DataInput.Select
+  alias Elemental.DataInput.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
   # TODO: fix select behaviour
@@ -69,9 +69,9 @@ defmodule Elemental.Field do
 
        ## Types
 
-       - `dropdown` powered by `Elemental.Dropdown.dropdown/1`.
-       - `select` powered by `Elemental.Select.select/1`.
-       - Any value supported by `Elemental.Input.input/1`.
+       - `dropdown` powered by `Elemental.DataInput.Dropdown.dropdown/1`.
+       - `select` powered by `Elemental.DataInput.Select.select/1`.
+       - Any value supported by `Elemental.DataInput.Input.input/1`.
        """
 
   attr :for,
@@ -144,51 +144,60 @@ defmodule Elemental.Field do
 
   ## Dropdown only attributes
 
-  attr :multi, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
-  attr :searchable, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
-  attr :"searchable-inline", :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
-  attr :hover, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
-  attr :open, :boolean, default: false, doc: "See `Elemental.Dropdown.dropdown/1`."
+  attr :multi, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+
+  attr :searchable, :boolean,
+    default: false,
+    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+
+  attr :"searchable-inline", :boolean,
+    default: false,
+    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+
+  attr :hover, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+  attr :open, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
 
   attr :align, :string,
     default: "start",
     values: ~w(start center end),
-    doc: "See `Elemental.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
 
   attr :from, :string,
     default: "bottom",
     values: ~w(top bottom left right),
-    doc: "See `Elemental.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
 
   ## Input only attributes
 
-  attr :checked, :boolean, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :list, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :max, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :maxlength, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :min, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :minlength, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :pattern, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :placeholder, :string, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :readonly, :boolean, default: nil, doc: "See `Elemental.Input.input/1`."
-  attr :step, :string, default: nil, doc: "See `Elemental.Input.input/1`."
+  attr :checked, :boolean, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :list, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :max, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :maxlength, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :min, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :minlength, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :pattern, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :placeholder, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :readonly, :boolean, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
+  attr :step, :string, default: nil, doc: "See `Elemental.DataInput.Input.input/1`."
 
   ## Dropdown and input shared attributes
 
   attr :multiple, :boolean,
     required: false,
-    doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Input.input/1`."
+    doc: "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Input.input/1`."
 
   ## Dropdown and select shared attributes
 
   attr :options,
        :list,
        required: false,
-       doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Select.select/1`."
+       doc:
+         "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Select.select/1`."
 
   attr :prompt, :string,
     default: nil,
-    doc: "See `Elemental.Dropdown.dropdown/1` and `Elemental.Select.select/1`."
+    doc:
+      "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Select.select/1`."
 
   slot :overlay,
     doc: """
@@ -243,8 +252,8 @@ defmodule Elemental.Field do
   @doc """
   > The primary form field component.
 
-  This component wraps `Elemental.Input`, `Elemental.Dropdown`, and
-  `Elemental.Select`  in a label and offers simplified
+  This component wraps `Elemental.DataInput.Input`, `Elemental.DataInput.Dropdown`, and
+  `Elemental.DataInput.Select`  in a label and offers simplified
   customizability and form integration.
 
   The component can be configured via overlays passed as slots from

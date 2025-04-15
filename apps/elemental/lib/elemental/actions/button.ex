@@ -1,4 +1,4 @@
-defmodule Elemental.Button do
+defmodule Elemental.Actions.Button do
   @moduledoc """
   > A simple button element with support for "links"
 

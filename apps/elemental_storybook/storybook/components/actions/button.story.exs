@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Button do
+defmodule Elemental.Storybook.Components.Actions.Button do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Button.button/1
+  def function, do: &Elemental.Actions.Button.button/1
 
   def variations do
     [

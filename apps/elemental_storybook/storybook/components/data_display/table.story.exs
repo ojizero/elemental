@@ -1,9 +1,9 @@
-defmodule Elemental.Storybook.Components.Table do
+defmodule Elemental.Storybook.Components.DataDisplay.Table do
   use PhoenixStorybook.Story, :component
 
-  def imports, do: [{Elemental.Table, header: 1, body: 1}]
+  def imports, do: [{Elemental.DataDisplay.Table, header: 1, body: 1}]
 
-  def function, do: &Elemental.Table.table/1
+  def function, do: &Elemental.DataDisplay.Table.table/1
 
   def variations do
     [

@@ -1,4 +1,4 @@
-defmodule Elemental.Loading do
+defmodule Elemental.Feedback.Loading do
   @moduledoc """
   > Exposing Daisy loaders as Phoenix components.
 

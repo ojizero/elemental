@@ -1,7 +1,7 @@
-defmodule Elemental.Storybook.Components.Dropdown do
+defmodule Elemental.Storybook.Components.DataInput.Dropdown do
   use PhoenixStorybook.Story, :component
 
-  def function, do: &Elemental.Dropdown.dropdown/1
+  def function, do: &Elemental.DataInput.Dropdown.dropdown/1
 
   @options ["Foo", "Bar", {"Baz", "Baz Value"}]
 

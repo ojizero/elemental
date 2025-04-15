@@ -53,13 +53,13 @@ defmodule Elemental do
   @doc false
   def __using__(_opts \\ []) do
     quote do
-      import Elemental.Breadcrumbs
-      import Elemental.Dropdown, except: [component: 1]
-      import Elemental.Input, except: [component: 1]
-      import Elemental.Loading
-      import Elemental.Select, except: [component: 1]
-      import Elemental.Table
-      import Elemental.Tooltip
+      use Elemental.Actions
+      use Elemental.DataDisplay
+      use Elemental.DataInput
+      use Elemental.Feedback
+      use Elemental.Layout
+      use Elemental.Mockup
+      use Elemental.Navigation
     end
   end
 end

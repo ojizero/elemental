@@ -1,4 +1,4 @@
-defmodule Elemental.Tooltip do
+defmodule Elemental.Feedback.Tooltip do
   @moduledoc """
   > Exposing Daisy tooltips as Phoenix components.
 

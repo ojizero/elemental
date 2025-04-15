@@ -1,4 +1,4 @@
-defmodule Elemental.Breadcrumbs do
+defmodule Elemental.Navigation.Breadcrumbs do
   @moduledoc """
   > Exposing Daisy breadcrumbs as Phoenix components.
 
@@ -13,20 +13,21 @@ defmodule Elemental.Breadcrumbs do
 
   use Elemental.Component
 
+  attr :class, :any, required: false
   attr :rest, :global
-
   slot :item, required: true, doc: "Specify the items in the breadcrumb."
 
   @doc "A wrapper around DaisyUI's breadcrumbs."
   def breadcrumbs(assigns) do
-    assigns = prepend_class(assigns, "breadcrumbs")
-
     ~H"""
-    <div {@rest}>
+    <div class={classes(assigns)} {@rest}>
       <ul>
         <li :for={item <- @item}>{render_slot(item)}</li>
       </ul>
     </div>
     """
   end
+
+  @doc false
+  def component_classes(_assigns), do: "breadcrumbs"
 end
