@@ -24,13 +24,15 @@ function debounce(fun, timeoutMs) {
  */
 export const ElementalDropdownSearch = {
   mounted() {
-    const contentId = this.el.getAttribute("elemental-hook-filterable-content-id")
+    const componentId = this.el.getAttribute("elemental-component-id")
+
+    const contentId = `${componentId}__content`
     const contentEl = document.getElementById(contentId)
     this.el.oninput = debounce(() => this.filterSibling(contentEl), 100)
 
-    const containerId = this.el.getAttribute("elemental-hook-container-id")
-    const containerEl = document.getElementById(containerId)
-    this.el.onclick = () => containerEl.setAttribute("open", true)
+    const dropdownId = `${componentId}__dropdown`
+    const dropdownEl = document.getElementById(dropdownId)
+    this.el.onclick = () => dropdownEl.setAttribute("open", true)
   },
 
   filterSibling(contentEl) {
@@ -79,9 +81,9 @@ export const ElementalDropdownSingleItem = {
     }
   },
 
-
   hideAllPrompts() {
-    const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
+    const componentId = this.el.getAttribute("elemental-component-id")
+    const promptId = `${componentId}__prompt_container`
     const promptEl = document.getElementById(promptId)
     Array.from(promptEl.children).forEach((child) => {
       const isSpan = child.nodeName === "SPAN"
@@ -100,9 +102,10 @@ export const ElementalDropdownSingleItem = {
   },
 
   closeDropdown() {
-    const contentId = this.el.getAttribute("elemental-hook-container-id")
-    const contentEl = document.getElementById(contentId)
-    contentEl.removeAttribute("open")
+    const componentId = this.el.getAttribute("elemental-component-id")
+    const dropdownId = `${componentId}__dropdown`
+    const dropdownEl = document.getElementById(dropdownId)
+    dropdownEl.removeAttribute("open")
   }
 }
 
@@ -124,10 +127,15 @@ export const ElementalDropdownMultiItem = {
   },
 
   hideDefaultPrompt() {
-    const promptId = this.el.getAttribute("elemental-hook-default-prompt-id")
+    const componentId = this.el.getAttribute("elemental-component-id")
+
+    const promptId = `${componentId}__default_prompt`
     const promptEl = document.getElementById(promptId)
-    if (promptEl.nodeName === "INPUT") this.hidePromptPlaceholder(promptEl)
-    else this.hidePromptSpan(promptEl)
+    if (promptEl) this.hidePromptSpan(promptEl)
+
+    const inlineSearchId = `${componentId}__inline_search`
+    const inlineSearchEl = document.getElementById(inlineSearchId)
+    if (inlineSearchEl) this.hidePromptPlaceholder(inlineSearchEl)
   },
 
   hidePromptSpan(el) {
@@ -146,11 +154,15 @@ export const ElementalDropdownMultiItem = {
   },
 
   showDefaultPrompt() {
-    console.log("showDefaultPrompt")
-    const promptId = this.el.getAttribute("elemental-hook-default-prompt-id")
+    const componentId = this.el.getAttribute("elemental-component-id")
+
+    const promptId = `${componentId}__default_prompt`
     const promptEl = document.getElementById(promptId)
-    if (promptEl.nodeName === "INPUT") this.showPromptPlaceholder(promptEl)
-    else this.showPromptSpan(promptEl)
+    if (promptEl) this.showPromptSpan(promptEl)
+
+    const inlineSearchId = `${componentId}__default_prompt`
+    const inlineSearchEl = document.getElementById(inlineSearchId)
+    if (inlineSearchEl) this.showPromptPlaceholder(inlineSearchEl)
   },
 
   showPromptSpan(el) {
@@ -161,7 +173,6 @@ export const ElementalDropdownMultiItem = {
 
   showPromptPlaceholder(el) {
     const placeholder = el.getAttribute("elemental-private-placeholder")
-    console.log({ placeholder })
     el.setAttribute("placeholder", placeholder)
     el.removeAttribute("elemental-private-placeholder")
   },
@@ -172,7 +183,8 @@ export const ElementalDropdownMultiItem = {
   },
 
   maybeShowDefaultPrompt() {
-    const promptId = this.el.getAttribute("elemental-hook-prompt-container-id")
+    const componentId = this.el.getAttribute("elemental-component-id")
+    const promptId = `${componentId}__prompt_container`
     const promptEl = document.getElementById(promptId)
     const noPromptShown = Array.from(promptEl.children).every((child) => {
       const isInput = child.nodeName === "INPUT"

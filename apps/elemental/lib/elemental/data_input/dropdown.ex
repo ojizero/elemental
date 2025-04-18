@@ -223,13 +223,13 @@ defmodule Elemental.DataInput.Dropdown do
         elemental-disable-styles
         phx-click={
           JS.toggle_attribute({"open", "true"},
-            to: "\##{Phoenix.HTML.css_escape("#{@name}__container")}"
+            to: "\##{Phoenix.HTML.css_escape("#{@id}__dropdown")}"
           )
         }
       >
       </Button.button>
       <details
-        id={@name <> "__container"}
+        id={@id <> "__dropdown"}
         class={[
           "dropdown",
           "dropdown-#{@align}",
@@ -239,8 +239,9 @@ defmodule Elemental.DataInput.Dropdown do
         ]}
         phx-click-away={JS.remove_attribute("open")}
       >
-        <summary id={@name <> "__prompt_container"} class={classes(assigns)}>
+        <summary id={@id <> "__prompt_container"} class={classes(assigns)}>
           <.dropdown_prompt
+            component_id={@id}
             name={@name}
             value={@value}
             multi={@multi}
@@ -249,36 +250,32 @@ defmodule Elemental.DataInput.Dropdown do
           />
           <.dropdown_search
             :if={@searchable and @inline_search}
-            id={@name <> "__search"}
+            component_id={@id}
+            id={@id <> "__inline_search"}
             name={@name <> "__search"}
             placeholder={@prompt}
-            container_element_id={@name <> "__container"}
-            filterable_content_id={@name <> "__content"}
           />
         </summary>
         <ul
-          id={@name <> "__content"}
+          id={@id <> "__content"}
           class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
         >
           <.dropdown_search
             :if={@searchable and not @inline_search}
-            id={@name <> "__search"}
+            component_id={@id}
+            id={@id <> "__search"}
             name={@name <> "__search"}
             placeholder="Search"
-            container_element_id={@name <> "__container"}
-            filterable_content_id={@name <> "__content"}
           />
           <.dropdown_item
             :for={{{label, value}, index} <- Enum.with_index(@options)}
-            id={@name <> "__item_#{index}"}
+            component_id={@id}
+            id={@id <> "__item_#{index}"}
             name={@name}
             label={label}
             value={value}
             multi={@multi}
             selected={value in @value}
-            container_element_id={@name <> "__container"}
-            default_prompt_element_id={default_prompt_element_id(assigns)}
-            prompt_container_element_id={@name <> "__prompt_container"}
           />
         </ul>
       </details>
@@ -286,6 +283,7 @@ defmodule Elemental.DataInput.Dropdown do
     """
   end
 
+  attr :component_id, :string, required: true
   attr :name, :string, required: true
   attr :value, :list, required: true
   attr :multi, :boolean, required: true
@@ -294,12 +292,12 @@ defmodule Elemental.DataInput.Dropdown do
 
   defp dropdown_prompt(assigns) do
     ~H"""
-    <span :if={@prompt} id={@name <> "__default_prompt"} class={@value != [] && "hidden"}>
+    <span :if={@prompt} id={@component_id <> "__default_prompt"} class={@value != [] && "hidden"}>
       {@prompt}
     </span>
     <span
       :for={{{label, value}, index} <- Enum.with_index(@options)}
-      id={@name <> "__item_#{index}_display"}
+      id={@component_id <> "__item_#{index}_display"}
       class={[@multi && "badge badge-neutral", value not in @value && "hidden"]}
     >
       {label}
@@ -307,19 +305,17 @@ defmodule Elemental.DataInput.Dropdown do
     """
   end
 
+  attr :component_id, :string, required: true
   attr :id, :string, required: true
   attr :name, :string, required: true
   attr :label, :string, required: true
   attr :value, :string, required: true
   attr :multi, :boolean, required: true
   attr :selected, :boolean, required: true
-  attr :container_element_id, :string, required: true
-  attr :default_prompt_element_id, :string, required: true
-  attr :prompt_container_element_id, :string, required: true
 
   defp dropdown_item(assigns) do
     ~H"""
-    <li elemental-label={@label} elemental-item-id={@id}>
+    <li tabindex="0" elemental-label={@label} elemental-item-id={@id}>
       <label>
         <Input.input
           id={@id}
@@ -329,9 +325,7 @@ defmodule Elemental.DataInput.Dropdown do
           checked={@selected}
           hidden={not @multi}
           phx-hook={phx_hook(assigns)}
-          elemental-hook-container-id={@container_element_id}
-          elemental-hook-default-prompt-id={@default_prompt_element_id}
-          elemental-hook-prompt-container-id={@prompt_container_element_id}
+          elemental-component-id={@component_id}
         />
         {@label}
       </label>
@@ -340,10 +334,9 @@ defmodule Elemental.DataInput.Dropdown do
   end
 
   attr :id, :string, required: true
+  attr :component_id, :string, required: true
   attr :name, :string, required: true
   attr :placeholder, :string, required: true
-  attr :container_element_id, :string, required: true
-  attr :filterable_content_id, :string, required: true
 
   defp dropdown_search(assigns) do
     ~H"""
@@ -355,8 +348,7 @@ defmodule Elemental.DataInput.Dropdown do
       class="border-1 m-1 focus:outline-none"
       placeholder={@placeholder}
       phx-hook="ElementalDropdownSearch"
-      elemental-hook-container-id={@container_element_id}
-      elemental-hook-filterable-content-id={@filterable_content_id}
+      elemental-component-id={@component_id}
     />
     """
   end
@@ -409,12 +401,6 @@ defmodule Elemental.DataInput.Dropdown do
 
   defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
   defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"
-
-  defp default_prompt_element_id(%{name: name, searchable: true, inline_search: true}),
-    do: name <> "__search"
-
-  defp default_prompt_element_id(%{name: name}),
-    do: name <> "__default_prompt"
 
   @doc false
   def component_classes(assigns) do
