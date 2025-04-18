@@ -302,6 +302,9 @@ defmodule Elemental.DataInput.Field do
     assigns = normalize_assigns(assigns)
 
     # TODO: cleanup validator component
+    # TODO: setCustomValidity on errors returned
+    # TODO: consider also doing reportValidity on error (optional)
+    # TODO: dropdown can't report validity
     ~H"""
     <div>
       <label class={classes(assigns)}>

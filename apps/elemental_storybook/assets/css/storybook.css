@@ -6,7 +6,18 @@
 }
 
 @source "../../../../";
-/* Workaround until I adjust to how Tailwind does treeshaking */
-@source inline("text-{accent,error,info,neutral,primary,secondary,success,warning}");
-@source inline("bg-{accent,error,info,neutral,primary,secondary,success,warning}");
-@source inline("bg-{accent,error,info,neutral,primary,secondary,success,warning}-content");
+
+/* Safe list all colors for all Daisy components */
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge,chat-bubble,status,link,step,alert,loading,progress,tooltip,checkbox,file,radio,range,select,input,textarea,toggle,divider}-{ghost,primary,secondary,accent,neutral,base-100,base-200,base-300,info,success,warning,error}");
+
+/* Safe list all Daisy colors for Tailwind provided utils */
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{bg,text,decoration,border,outline,shadow,inset-shadow,ring,inset-ring,accent,caret,fill,stroke}-{primary,secondary,accent,neutral,base-100,base-200,base-300,info,success,warning,error}{-content,}");
+
+/* And opacity (only one style for it for demoing) */
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{bg,text,decoration,border,outline,shadow,inset-shadow,ring,inset-ring,accent,caret,fill,stroke}-{primary,secondary,accent,neutral,base-100,base-200,base-300,info,success,warning,error}{-content,}/{0..100..1}");
+
+/* Safe list bordered Daisy variants */
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge}-{outline,dash,soft}");
+
+/* Safe list all Daisy sizes */
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge,chat-bubble,status,link,step,alert,loading,progress,tooltip,checkbox,file,radio,range,select,input,textarea,toggle,divider}-{xs,sm,md,lg,xl}");

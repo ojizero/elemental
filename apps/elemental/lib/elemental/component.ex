@@ -10,8 +10,6 @@ defmodule Elemental.Component do
       use PhoenixHTMLHelpers
 
       import Elemental.Component
-      import Elemental.Support.Sizes
-      import Elemental.Support.Colors
 
       alias Phoenix.LiveView.JS
 
@@ -28,6 +26,18 @@ defmodule Elemental.Component do
       defoverridable component_classes: 1, empty_classes: 0
     end
   end
+
+  @doc false
+  # We treat "ghost" style as a color
+  def daisy_colors, do: ~w(ghost neutral primary secondary accent info success warning error)
+
+  @doc false
+  def daisy_content_colors do
+    ~w(neutral-content primary-content secondary-content accent-content info-content success-content warning-content error-content)
+  end
+
+  @doc false
+  def daisy_sizes, do: ~w(xs sm md lg xl)
 
   @doc false
   def classes(mod, %{"elemental-disable-styles": true} = assigns),

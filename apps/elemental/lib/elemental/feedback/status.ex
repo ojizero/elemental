@@ -28,8 +28,8 @@ defmodule Elemental.Feedback.Status do
     ~H"""
     <span class={[
       "status",
-      status_size(assigns[:size]),
-      status_color(assigns[:color]),
+      assigns[:size] && "status-#{@size}",
+      assigns[:color] && "status-#{@color}",
       assigns[:animate] && "status-#{@animate}"
     ]}>
     </span>
