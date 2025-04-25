@@ -42,16 +42,26 @@ defmodule Elemental.Feedback.Live.ToastGroup do
           # handle your event normally
           # now you can send the user a toast by calling
           ToastGroup.send_message("Some notice to the user")
+          # remainder of your event handler
         end
-
       end
+
+  ## Phoenix' flash system
+
+  You can also pass the `flash` attribute bound to Phoenix' flash system
+  and would carry over the same behaviour as defined in the stateless
+  variant, i.e. it should interoperate with it normally without
+  any additional work form the consumer side.
+
+  Phoenix' flashes are rendered immediately after any messages passed/sent
+  over via the `Elemental.Feedback.Live.ToastGroup` module.
   """
 
   use Elemental.Component, :live
 
   import Elemental.Feedback.Toast
 
-  @default_toast_group_id "live-toast-messages"
+  @default_toast_group_id "toast-group"
   @toast_message_clear_event "el:toast-message-clear"
 
   ## Client/external API
@@ -78,7 +88,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
       do: send_message(level, nil, message, opts)
 
   def send_message({level, title, message}, opts)
-      when is_binary(title) and is_binary(message),
+      when is_binary(message),
       do: send_message(level, title, message, opts)
 
   @doc """
@@ -128,18 +138,18 @@ defmodule Elemental.Feedback.Live.ToastGroup do
        default: @default_toast_group_id,
        doc: "The ID used for the toast group component."
 
-  attr :flash,
-       :map,
-       default: %{},
-       doc: """
-       In order to provide compatibility with Phoenix' flash subsystem we accept a
-       flash attribute as defined by Phoenix and do render it right after the
-       messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
-
-       Flash messages will only emit an `lv:clear-flash` event when cleared without
-       a predefined target. This is to stay inline with how Phoenix expects those
-       to behave.
-       """
+  # attr :flash,
+  #      :map,
+  #      default: %{},
+  #      doc: """
+  #      In order to provide compatibility with Phoenix' flash subsystem we accept a
+  #      flash attribute as defined by Phoenix and do render it right after the
+  #      messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
+  #
+  #      Flash messages will only emit an `lv:clear-flash` event when cleared without
+  #      a predefined target. This is to stay inline with how Phoenix expects those
+  #      to behave.
+  #      """
 
   attr :placement,
        :string,
@@ -173,7 +183,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   @impl Phoenix.LiveComponent
   def render(assigns) do
     ~H"""
-    <div id={@id <> "-live-component"}>
+    <div id={container_id(@id)}>
       <.toast_group
         id={@id}
         dash={@dash}
@@ -195,6 +205,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   @impl Phoenix.LiveComponent
   def mount(socket) do
     socket
+    |> stream_configure(:messages, dom_id: fn _item -> random() end)
     |> stream(:messages, [])
     |> assign(:on_clear, @toast_message_clear_event)
     |> assign(:phoenix_errors, socket.assigns[:"phoenix-errors"])
@@ -211,7 +222,8 @@ defmodule Elemental.Feedback.Live.ToastGroup do
     |> then(&{:ok, &1})
   end
 
-  def update(_assigns, socket), do: {:ok, socket}
+  def update(assigns, socket),
+    do: {:ok, assign(socket, assigns)}
 
   @doc false
   @impl Phoenix.LiveComponent
@@ -224,4 +236,6 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   end
 
   def handle_event(_event, _params, socket), do: {:noreply, socket}
+
+  defp container_id(id), do: "#{id}-component-root"
 end

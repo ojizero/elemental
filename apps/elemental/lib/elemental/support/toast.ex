@@ -133,7 +133,7 @@ defmodule Elemental.Support.Toast do
   end
 
   defp normalize_alert_message(%{message: {level, content}} = assigns)
-       when is_binary(level) and is_message_content(content) do
+       when is_message_content(content) do
     assigns
     |> assign(type: level)
     |> assign(:title, humanize(level))
@@ -141,7 +141,7 @@ defmodule Elemental.Support.Toast do
   end
 
   defp normalize_alert_message(%{message: {level, title, content}} = assigns)
-       when is_binary(level) and is_binary(title) and is_message_content(content) do
+       when is_message_content(content) do
     assigns
     |> assign(type: level)
     |> assign(:title, title)
