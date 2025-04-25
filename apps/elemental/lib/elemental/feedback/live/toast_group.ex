@@ -13,6 +13,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   import Elemental.Feedback.Toast
 
   @default_toast_group_id "live-toast-messages"
+  @toast_message_clear_event "el:toast-message-clear"
 
   ## Client/external API
 
@@ -79,17 +80,23 @@ defmodule Elemental.Feedback.Live.ToastGroup do
 
   ## Live component
 
-  attr :id, :string, default: @default_toast_group_id
+  attr :id,
+       :string,
+       default: @default_toast_group_id,
+       doc: "The ID used for the toast group component."
 
-  attr :messages,
-       :list,
-       default: [],
-       doc: "[string|{string, string}]"
+  attr :flash,
+       :map,
+       default: %{},
+       doc: """
+       In order to provide compatibility with Phoenix' flash subsystem we accept a
+       flash attribute as defined by Phoenix and do render it right after the
+       messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
 
-  attr :"auto-close",
-       :boolean,
-       default: true,
-       doc: ""
+       Flash messages will only emit an `lv:clear-flash` event when cleared without
+       a predefined target. This is to stay inline with how Phoenix expects those
+       to behave.
+       """
 
   attr :placement,
        :string,
@@ -98,6 +105,11 @@ defmodule Elemental.Feedback.Live.ToastGroup do
                   bottom-start bottom-center bottom-end),
        default: "top-end",
        doc: "The positioning of the toast stack."
+
+  attr :"phoenix-errors",
+       :boolean,
+       default: true,
+       doc: "Controls showing Phoenix' client and server errors."
 
   attr :outline,
        :boolean,
@@ -114,31 +126,57 @@ defmodule Elemental.Feedback.Live.ToastGroup do
        default: false,
        doc: "Render the alert in soft style."
 
-  attr :"phoenix-errors",
-       :boolean,
-       default: true,
-       doc: ""
-
   @doc false
   @impl Phoenix.LiveComponent
   def render(assigns) do
-    # TODO: convert this to use streams // requires support of streams in main toast group component
     ~H"""
-    <%!-- TODO: pass everything here --%>
-    <%!-- NOTE: may need to redo it to simplify streaming --%>
-    <.toast_group messages={@messages} />
+    <.toast_group
+      id={@id}
+      dash={@dash}
+      soft={@soft}
+      flash={@flash}
+      outline={@outline}
+      phx-update="stream"
+      phx-target={@myself}
+      on-clear={@on_clear}
+      placement={@placement}
+      messages={@stream.messages}
+      phoenix-errors={@phoenix_errors}
+    />
     """
   end
 
   @doc false
   @impl Phoenix.LiveComponent
-  def mount(socket), do: {:ok, socket}
+  def mount(socket) do
+    socket
+    |> stream(:messages, [])
+    |> assign(:on_clear, @toast_message_clear_event)
+    |> assign(:phoenix_errors, socket.assigns[:"phoenix-errors"])
+    |> then(&{:ok, &1})
+  end
 
   @doc false
   @impl Phoenix.LiveComponent
+  def update(assigns, socket)
+
+  def update(%{message: message}, socket) do
+    socket
+    |> stream_insert(:messages, message)
+    |> then(&{:ok, &1})
+  end
+
   def update(_assigns, socket), do: {:ok, socket}
 
   @doc false
   @impl Phoenix.LiveComponent
+  def handle_event(event, params, socket)
+
+  def handle_event(@toast_message_clear_event, %{"id" => id}, socket) do
+    socket
+    |> stream_delete_by_dom_id(:messages, id)
+    |> then(&{:noreply, &1})
+  end
+
   def handle_event(_event, _params, socket), do: {:noreply, socket}
 end

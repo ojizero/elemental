@@ -13,9 +13,13 @@ defmodule Elemental.Support.Toast do
   attr :dash, :boolean, default: false
   attr :soft, :boolean, default: false
   attr :clear_alert_event, :string, default: nil
+  attr :"phx-target", :any, default: nil
 
   def alert_message(assigns) do
-    assigns = normalize_alert_message(assigns)
+    assigns =
+      assigns
+      |> assign(:phx_target, assigns[:"phx-target"])
+      |> normalize_alert_message()
 
     ~H"""
     <Alert.alert id={@id} type={@type} outline={@outline} dash={@dash} soft={@dash}>
@@ -26,7 +30,12 @@ defmodule Elemental.Support.Toast do
         </h3>
         {@content}
       </div>
-      <.close_button target_id={@id} type={@type} clear_alert_event={@clear_alert_event} />
+      <.close_button
+        type={@type}
+        target_id={@id}
+        phx_target={@phx_target}
+        clear_alert_event={@clear_alert_event}
+      />
     </Alert.alert>
     """
   end
@@ -78,8 +87,9 @@ defmodule Elemental.Support.Toast do
     """
   end
 
-  attr :target_id, :string, required: true
   attr :type, :string, values: [nil, "info", "success", "warning", "error"], default: nil
+  attr :target_id, :string, required: true
+  attr :phx_target, :any, default: nil
   attr :clear_alert_event, :string, default: nil
 
   defp close_button(assigns) do
@@ -91,6 +101,7 @@ defmodule Elemental.Support.Toast do
       shape="circle"
       size="xs"
       phx-click={close_alert(@target_id, @type, @clear_alert_event)}
+      phx-target={@phx_target}
     >
       <.x_mark />
     </Button.button>
@@ -135,39 +146,6 @@ defmodule Elemental.Support.Toast do
     |> assign(type: level)
     |> assign(:title, title)
     |> assign(:content, content)
-  end
-
-  defp normalize_alert_message(%{message: {"phx-" <> level, content}} = assigns)
-       when is_message_content(content) do
-    assigns
-    |> assign(type: level)
-    |> assign(:title, humanize(level))
-    |> assign(:content, content)
-    # NOTE: this way flash messages are not controlled by
-    #       consumer I think this is okay but is it?
-    |> assign(:clear_alert_event, "lv:clear-flash")
-  end
-
-  defp normalize_alert_message(%{message: {"phx-" <> level, content}} = assigns)
-       when is_message_content(content) do
-    assigns
-    |> assign(type: level)
-    |> assign(:title, humanize(level))
-    |> assign(:content, content)
-    # NOTE: this way flash messages are not controlled by
-    #       consumer I think this is okay but is it?
-    |> assign(:clear_alert_event, "lv:clear-flash")
-  end
-
-  defp normalize_alert_message(%{message: {"phx-" <> level, title, content}} = assigns)
-       when is_binary(title) and is_message_content(content) do
-    assigns
-    |> assign(type: level)
-    |> assign(:title, title)
-    |> assign(:content, content)
-    # NOTE: this way flash messages are not controlled by
-    #       consumer I think this is okay but is it?
-    |> assign(:clear_alert_event, "lv:clear-flash")
   end
 
   # SVGs in place for Heroicons used

@@ -12,6 +12,8 @@ defmodule Elemental.Feedback.Toast do
 
   import Elemental.Support.Toast
 
+  alias Elemental.Feedback.Live.ToastGroup
+
   attr :id, :string, default: "toast"
 
   attr :placement,
@@ -60,6 +62,21 @@ defmodule Elemental.Feedback.Toast do
        default: "toast-messages",
        doc: "The ID used for the toast group component."
 
+  attr :live,
+       :boolean,
+       default: false,
+       doc: """
+       Enables the LiveComponent to be rendered in place of the stateless/dead
+       component which is the default.
+
+       If enabled you can use `Elemental.Feedback.Live.ToastGroup` module to interact
+       dynamically with the toast group and send messages from the server side
+       dynamically.
+
+       Enabling this disables support for passing `messages`, `on-clear` and the global
+       attributes.
+       """
+
   attr :messages,
        :any,
        required: true,
@@ -81,6 +98,21 @@ defmodule Elemental.Feedback.Toast do
 
        > This list of messages can also be provided from a LiveView stream, where each item
        > coming from the stream must respect the defined typings for the message items.
+
+       > Ignored if `live` is enabled.
+       """
+
+  attr :flash,
+       :map,
+       default: %{},
+       doc: """
+       In order to provide compatibility with Phoenix' flash subsystem we accept a
+       flash attribute as defined by Phoenix and do render it right after the
+       messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
+
+       Flash messages will ignore the `on-clear` and `phx-target` and instead emit
+       an `lv:clear-flash` event when cleared without a predefined target. This
+       is to stay inline with how Phoenix expects those to behave.
        """
 
   attr :placement,
@@ -94,12 +126,11 @@ defmodule Elemental.Feedback.Toast do
   attr :"on-clear",
        :string,
        default: nil,
-       doc: "The event to emit on closing of an alert"
+       doc: """
+       The event to emit on closing of an alert
 
-  attr :"auto-clear",
-       :boolean,
-       default: false,
-       doc: "Enables automatic clearing of the messages displayed."
+       > Ignored if `live` is enabled.
+       """
 
   attr :"phoenix-errors",
        :boolean,
@@ -121,7 +152,9 @@ defmodule Elemental.Feedback.Toast do
        default: false,
        doc: "Render the alert in soft style."
 
-  attr :rest, :global
+  #  TODO: document?
+  attr :"phx-target", :any, default: nil, doc: false
+  attr :"phx-update", :any, default: nil, doc: false
 
   @doc """
   Provides an abstraction on top of `toast/1` for displaying a list alerts
@@ -143,24 +176,31 @@ defmodule Elemental.Feedback.Toast do
   If you want to have multiple toast groups on the same placement you're
   better off building on top of `toast/1` directly instead.
 
-  ## Implementation notes
+  ## Phoenix flash system integration
 
-  To allow seamless interoperability with Phoenix' flash system, it's
-  preferable the use of `flash_group/1` component which should act
-  as a drop-in for the Phoenix provided one.
+  To allow seamless interoperability with Phoenix' flash system, if passed
+  Phoenix' flash messages via the `flash` attribute.
 
-  Under the hood this prefixes message types with `phx-` to indicate it
-  originates from Phoenix' flash system. Any message originating from
-  Phoenix' flash system will ignore the any provided value for
-  `on-clear` and instead send the Phoenix event of
+  Any message originating from Phoenix' flash system will ignore the any
+  provided value for `on-clear` and instead send the Phoenix event of
   `lv:clear-flash`.
 
-  Additionally this component will display Phoenix' client and server errors
-  by default, these errors are non-closeable and will stay until the client
-  side reconnects properly with the server side. This can be controlled by
-  the `phoenix-errors` attribute. Note these messages won't trigger
-  `on-clear` events when disappearing.
+  Also, messages originating from Phoenix' flash subsystem will be rendered immediately
+  after the messages formatted via `Elemental.Feedback.Toast.toast_group/1` and in
+  an identical styling via the `Elemental.Feedback.Alert.alert/1` component.
+
+  ## Phoenix' client and server errors
+
+  This component will display Phoenix' client and server errors by default, these
+  errors are non-closeable and will stay until the client side reconnects
+  properly with the server side. This can be controlled by the
+  `phoenix-errors` attribute. Note these messages won't
+  trigger `on-clear` events when disappearing.
   """
+  def toast_group(assigns)
+
+  def toast_group(%{live: true} = assigns),
+    do: ~H"<.live_component module={ToastGroup} {assigns} />"
 
   def toast_group(assigns) do
     assigns = normalize_toast_group(assigns)
@@ -170,7 +210,7 @@ defmodule Elemental.Feedback.Toast do
     # TODO: auto close alerts
 
     ~H"""
-    <.toast id={@id} placement={@placement} {@rest}>
+    <.toast id={@id} placement={@placement} phx-update={@phx_update}>
       <.alert_message
         :for={{id, message} <- @messages}
         id={id}
@@ -179,6 +219,16 @@ defmodule Elemental.Feedback.Toast do
         dash={@dash}
         soft={@dash}
         clear_alert_event={@clear_alert_event}
+        phx-target={@phx_target}
+      />
+      <.alert_message
+        :for={{kind, message} <- Map.to_list(@flash)}
+        id={"#{random()}-phx-#{kind}"}
+        message={{"#{kind}", message}}
+        outline={@outline}
+        dash={@dash}
+        soft={@dash}
+        clear_alert_event="lv:clear-flash"
       />
       <.phoenix_messages :if={@phoenix_errors} outline={@outline} dash={@dash} soft={@dash} />
     </.toast>
@@ -188,32 +238,17 @@ defmodule Elemental.Feedback.Toast do
   attr :id, :string, default: nil
   attr :flash, :map, required: true
 
-  @doc """
-  > Drop in for Phoenix' flash group.
-
-  As currently implemented this will bypass the ability to send custom
-  events on alert closure, i.e. when used the Phoenix LiveView event
-  `lv:clear-flash` will strictly be used for messages originating
-  from the Phoenix flash system.
-  """
-  def flash_group(assigns) do
-    assigns = normalize_flash_group(assigns)
-
-    ~H"""
-    <.toast_group id={@id} messages={@messages} phoenix-errors />
-    """
-  end
-
-  defp normalize_flash_group(assigns) do
-    messages = Enum.map(assigns.flash, fn {key, value} -> {"phx-#{key}", value} end)
-    assign(assigns, :messages, messages)
-  end
+  @doc "Drop in for Phoenix' flash group."
+  def flash_group(assigns),
+    do: ~H"<.toast_group id={@id} messages={[]} flash={@flash} phoenix-errors />"
 
   defp normalize_toast_group(assigns) do
     assigns
     |> normalize_messages()
     |> assign(:phoenix_errors, assigns[:"phoenix-errors"])
     |> assign(:clear_alert_event, assigns[:"on-clear"])
+    |> assign(:phx_target, assigns[:"phx-target"])
+    |> assign(:phx_update, assigns[:"phx-update"])
   end
 
   defp normalize_messages(assigns) do

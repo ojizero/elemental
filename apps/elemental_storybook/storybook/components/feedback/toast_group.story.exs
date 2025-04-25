@@ -75,6 +75,17 @@ defmodule Elemental.Storybook.Components.Feedback.ToastGroup do
           ],
           "phoenix-errors": false
         }
+      },
+      %Variation{
+        id: :supports_flash,
+        attributes: %{
+          messages: [],
+          flash: %{
+            info: "My info flash!",
+            error: "My error flash!"
+          },
+          "phoenix-errors": false
+        }
       }
     ]
   end
