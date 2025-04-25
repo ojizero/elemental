@@ -6,12 +6,34 @@ defmodule Elemental.Component do
   alias Phoenix.LiveView.JS
 
   @doc false
-  defmacro __using__(_opts \\ []) do
+  defmacro __using__(which) do
+    which = if is_atom(which), do: which, else: :component
+    apply(__MODULE__, which, [])
+  end
+
+  @doc false
+  def component do
     quote do
       use Phoenix.Component, global_prefixes: ~w(elemental-)
+
+      unquote(helpers())
+    end
+  end
+
+  @doc false
+  def live do
+    quote do
+      use Phoenix.LiveComponent, global_prefixes: ~w(elemental-)
+
+      unquote(helpers())
+    end
+  end
+
+  defp helpers do
+    quote do
       use PhoenixHTMLHelpers
 
-      import Elemental.Component
+      import Elemental.Component, except: [component: 0, live: 0]
 
       alias Phoenix.LiveView.JS
 
@@ -88,6 +110,9 @@ defmodule Elemental.Component do
     JS.show(js,
       to: selector,
       time: 300,
+      # Define display as inherit to avoid breaking original
+      # styles of components when hiding/showing them.
+      display: "inherit",
       transition:
         {"transition-all transform ease-out duration-300",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",

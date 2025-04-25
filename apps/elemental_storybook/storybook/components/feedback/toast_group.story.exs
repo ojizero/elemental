@@ -29,23 +29,38 @@ defmodule Elemental.Storybook.Components.Feedback.ToastGroup do
     [
       %Variation{
         id: :default,
-        attributes: %{messages: ["Default message."]}
+        attributes: %{
+          messages: ["Default message."],
+          "phoenix-errors": false
+        }
       },
       %Variation{
         id: :success,
-        attributes: %{messages: [{"success", "My successful message!"}]}
+        attributes: %{
+          messages: [{"success", "My successful message!"}],
+          "phoenix-errors": false
+        }
       },
       %Variation{
         id: :info,
-        attributes: %{messages: [{"info", "Is this informative?"}]}
+        attributes: %{
+          messages: [{"info", "Is this informative?"}],
+          "phoenix-errors": false
+        }
       },
       %Variation{
         id: :warning,
-        attributes: %{messages: [{"warning", "Hopefully it's not a bad API!"}]}
+        attributes: %{
+          messages: [{"warning", "Hopefully it's not a bad API!"}],
+          "phoenix-errors": false
+        }
       },
       %Variation{
         id: :error,
-        attributes: %{messages: [{"error", "Hoping this isn't a failure!"}]}
+        attributes: %{
+          messages: [{"error", "Hoping this isn't a failure!"}],
+          "phoenix-errors": false
+        }
       },
       %Variation{
         id: :stacked,
@@ -57,7 +72,8 @@ defmodule Elemental.Storybook.Components.Feedback.ToastGroup do
             {"info", "be arbitrarily"},
             {"warning", "stacked,"},
             {"error", "is that cool?"}
-          ]
+          ],
+          "phoenix-errors": false
         }
       }
     ]

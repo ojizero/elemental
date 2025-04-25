@@ -12,9 +12,7 @@ defmodule Elemental.Feedback.Toast do
 
   import Elemental.Support.Toast
 
-  # TODO: close button
-  # TODO: integrate with Phoenix flashes
-  # TODO: flash & flash groups
+  attr :id, :string, default: "toast"
 
   attr :placement,
        :string,
@@ -24,9 +22,9 @@ defmodule Elemental.Feedback.Toast do
        default: "top-end",
        doc: "The positioning of the toast stack."
 
-  attr :id, :string, default: "toast"
-
   slot :inner_block, required: true
+
+  attr :rest, :global
 
   @doc """
   The primary toast component, this guarantees a content to be displayed
@@ -50,29 +48,40 @@ defmodule Elemental.Feedback.Toast do
         "toast-#{@horizontal}",
         "z-100"
       ]}
+      {@rest}
     >
       {render_slot(@inner_block)}
     </div>
     """
   end
 
-  attr :id, :string, default: "toast-messages"
+  attr :id,
+       :string,
+       default: "toast-messages",
+       doc: "The ID used for the toast group component."
 
   attr :messages,
-       :list,
-       #  default: [],
+       :any,
        required: true,
-       doc: "[string|{string, string}]"
+       doc: """
+       The list of messages to display in the group, each message in the list
+       must be one type as one of the following;
 
-  attr :"auto-close",
-       :boolean,
-       default: true,
-       doc: ""
+       1. `String.t` indicating the message is simply some text context to display. No
+          title is displayed for it and it will be shown in the default alert style.
+       2. `{String.t, String.t}` indicating a message where the first item is the alert type
+          to use, as defined in `Elemental.Feedback.Alert.alert/1`, and the second is
+          the message content itself. The alert level/type will be used as title.
+       3. `{String.t, String.t, String.t}` indicating a message where the first item is the
+          alert type to use, as defined in `Elemental.Feedback.Alert.alert/1`, the second
+          is the message's title to display, and the third indicating the message content
+          itself.
 
-  # attr :"data-duration",
-  #      :integer,
-  #      default: 2_000,
-  #      doc: "MS"
+       Mixing those types is in one list of messages is allowed an will be normalized.
+
+       > This list of messages can also be provided from a LiveView stream, where each item
+       > coming from the stream must respect the defined typings for the message items.
+       """
 
   attr :placement,
        :string,
@@ -81,6 +90,21 @@ defmodule Elemental.Feedback.Toast do
                   bottom-start bottom-center bottom-end),
        default: "top-end",
        doc: "The positioning of the toast stack."
+
+  attr :"on-clear",
+       :string,
+       default: nil,
+       doc: "The event to emit on closing of an alert"
+
+  attr :"auto-clear",
+       :boolean,
+       default: false,
+       doc: "Enables automatic clearing of the messages displayed."
+
+  attr :"phoenix-errors",
+       :boolean,
+       default: true,
+       doc: "Controls showing Phoenix' client and server errors."
 
   attr :outline,
        :boolean,
@@ -97,10 +121,7 @@ defmodule Elemental.Feedback.Toast do
        default: false,
        doc: "Render the alert in soft style."
 
-  attr :"phoenix-errors",
-       :boolean,
-       default: true,
-       doc: ""
+  attr :rest, :global
 
   @doc """
   Provides an abstraction on top of `toast/1` for displaying a list alerts
@@ -109,56 +130,100 @@ defmodule Elemental.Feedback.Toast do
 
   > This component is intended for building toast/flash messaging systems.
 
-  > This component displays Phoenix' client and server errors by default.
-
   This component doesn't respect Phoenix' default flashes API, for that use
-  instead the `flashes/1` component which provides an adapter layer to
+  instead the `flash_group/1` component which provides an adapter layer to
   allow seamless integration with Phoenix' flash system.
 
-  """
-  def toast_group(assigns) do
-    assigns =
-      assigns
-      |> update(:messages, fn messages ->
-        messages
-        |> List.wrap()
-        |> Enum.map(fn
-          {level, title, message} -> {level, title, message}
-          {level, message} -> {level, humanize(level), message}
-          message -> {nil, nil, message}
-        end)
-      end)
-      |> assign(:phoenix_errors, fn %{"phoenix-errors": phoenix_errors} -> phoenix_errors end)
+  ## Caveats
 
-    # TODO: make sure it is on top of everything
-    # TODO: support streams
-    # TODO: live version (is this really needed??)
-    # TODO: compatibility with phoenix flashes
+  Inherent to the `toast/1` component which this component is built of, it
+  won't play nice to having another toast group with messages overlapping
+  it and the behaviour won't be controlled by Elemental in such cases.
+
+  If you want to have multiple toast groups on the same placement you're
+  better off building on top of `toast/1` directly instead.
+
+  ## Implementation notes
+
+  To allow seamless interoperability with Phoenix' flash system, it's
+  preferable the use of `flash_group/1` component which should act
+  as a drop-in for the Phoenix provided one.
+
+  Under the hood this prefixes message types with `phx-` to indicate it
+  originates from Phoenix' flash system. Any message originating from
+  Phoenix' flash system will ignore the any provided value for
+  `on-clear` and instead send the Phoenix event of
+  `lv:clear-flash`.
+
+  Additionally this component will display Phoenix' client and server errors
+  by default, these errors are non-closeable and will stay until the client
+  side reconnects properly with the server side. This can be controlled by
+  the `phoenix-errors` attribute. Note these messages won't trigger
+  `on-clear` events when disappearing.
+  """
+
+  def toast_group(assigns) do
+    assigns = normalize_toast_group(assigns)
+
+    # TODO: live version
+    # TODO: compatibility with phoenix flashes -- send clear message
     # TODO: auto close alerts
 
     ~H"""
-    <.toast id={@id} placement={@placement}>
+    <.toast id={@id} placement={@placement} {@rest}>
       <.alert_message
-        :for={{level, title, message} <- @messages}
-        type={level}
-        title={title}
+        :for={{id, message} <- @messages}
+        id={id}
         message={message}
         outline={@outline}
         dash={@dash}
         soft={@dash}
+        clear_alert_event={@clear_alert_event}
       />
       <.phoenix_messages :if={@phoenix_errors} outline={@outline} dash={@dash} soft={@dash} />
     </.toast>
     """
   end
 
-  attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
-  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr :id, :string, default: nil
+  attr :flash, :map, required: true
 
-  @doc "Adapts Phoenix' flash message system with `toast_group/1`."
-  def flashes(assigns) do
+  @doc """
+  > Drop in for Phoenix' flash group.
+
+  As currently implemented this will bypass the ability to send custom
+  events on alert closure, i.e. when used the Phoenix LiveView event
+  `lv:clear-flash` will strictly be used for messages originating
+  from the Phoenix flash system.
+  """
+  def flash_group(assigns) do
+    assigns = normalize_flash_group(assigns)
+
     ~H"""
-    <.toast_group id={@id} messages={Map.to_list(@flash)} phoenix-errors />
+    <.toast_group id={@id} messages={@messages} phoenix-errors />
     """
   end
+
+  defp normalize_flash_group(assigns) do
+    messages = Enum.map(assigns.flash, fn {key, value} -> {"phx-#{key}", value} end)
+    assign(assigns, :messages, messages)
+  end
+
+  defp normalize_toast_group(assigns) do
+    assigns
+    |> normalize_messages()
+    |> assign(:phoenix_errors, assigns[:"phoenix-errors"])
+    |> assign(:clear_alert_event, assigns[:"on-clear"])
+  end
+
+  defp normalize_messages(assigns) do
+    update(assigns, :messages, fn
+      # Keep streams as is, however if given an Enum we'll add an ID
+      # to normalize how we handle both down the line.
+      %Phoenix.LiveView.LiveStream{} = messages -> messages
+      messages -> Enum.map(messages, &normalize_message/1)
+    end)
+  end
+
+  defp normalize_message(message), do: {random(), message}
 end
