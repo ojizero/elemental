@@ -41,13 +41,14 @@ defmodule Elemental.Storybook.Components.Feedback.Live.ToastGroup do
     assigns = assign(assigns, :placements, @placements)
 
     ~H"""
-    <.toast_group live placement={@placement} />
+    <.toast_group live placement={@placement} flash={@flash} />
 
-    <div>
-      <.form for={%{}} phx-submit="send-toast" phx-change="changed">
-        <div class="flex flex-col gap-2 w-fit">
+    <div class="m-2">
+      <h3 class="m-4 font-semibold">Placement of the toast group</h3>
+      <.form for={%{}} phx-change="changed" phx-submit="ignore">
+        <div class="w-fit">
           <.field
-            type="dropdown"
+            type="select"
             name="placement"
             options={@placements}
             value="top-end"
@@ -55,30 +56,64 @@ defmodule Elemental.Storybook.Components.Feedback.Live.ToastGroup do
           >
             <:label value="Placement" />
           </.field>
-          <.field
-            type="dropdown"
-            name="type"
-            value=""
-            options={[
-              {"Default", ""},
-              {"Success", "success"},
-              {"Info", "info"},
-              {"Warning", "warning"},
-              {"Error", "error"}
-            ]}
-            disable-validator
-          >
-            <:label value="Type" />
-          </.field>
-          <.field name="title" placeholder="The message title" disable-validator>
-            <:label value="Title" />
-          </.field>
-          <.field name="notice" placeholder="The message content" disable-validator>
-            <:label value="Content" />
-          </.field>
-          <.button>Send toast</.button>
         </div>
       </.form>
+    </div>
+
+    <div class="flex flex-row py-6">
+      <div class="m-2">
+        <h3 class="m-4 font-semibold">Send a toast message</h3>
+        <.form for={%{}} phx-submit="send-toast">
+          <div class="flex flex-col gap-2 w-fit">
+            <.field
+              type="select"
+              name="type"
+              value=""
+              options={[
+                {"Default", ""},
+                {"Success", "success"},
+                {"Info", "info"},
+                {"Warning", "warning"},
+                {"Error", "error"}
+              ]}
+              disable-validator
+            >
+              <:label value="Type" />
+            </.field>
+            <.field name="title" placeholder="The message title" disable-validator>
+              <:label value="Title" />
+            </.field>
+            <.field name="notice" placeholder="The message content" disable-validator>
+              <:label value="Content" />
+            </.field>
+            <.button>Send toast</.button>
+          </div>
+        </.form>
+      </div>
+
+      <div class="m-2">
+        <h3 class="m-4 font-semibold">Use Phoenix' put_flash</h3>
+        <.form for={%{}} phx-submit="put-flash">
+          <div class="flex flex-col gap-2 w-fit">
+            <.field
+              type="select"
+              name="kind"
+              value=""
+              options={[
+                {"Info", "info"},
+                {"Error", "error"}
+              ]}
+              disable-validator
+            >
+              <:label value="Kind" />
+            </.field>
+            <.field name="flash" placeholder="The message content" disable-validator>
+              <:label value="Content" />
+            </.field>
+            <.button>Send it</.button>
+          </div>
+        </.form>
+      </div>
     </div>
     """
   end
@@ -119,6 +154,10 @@ defmodule Elemental.Storybook.Components.Feedback.Live.ToastGroup do
         socket
       ) do
     {:noreply, assign(socket, :placement, placement)}
+  end
+
+  def handle_event("put-flash", %{"kind" => kind, "flash" => flash}, socket) do
+    {:noreply, put_flash(socket, kind, flash)}
   end
 
   def handle_event(_whatever, _params, socket) do

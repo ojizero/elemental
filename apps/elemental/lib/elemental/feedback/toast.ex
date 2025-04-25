@@ -206,7 +206,6 @@ defmodule Elemental.Feedback.Toast do
   def toast_group(assigns) do
     assigns = normalize_toast_group(assigns)
 
-    # TODO: live version
     # TODO: compatibility with phoenix flashes -- send clear message
     # TODO: auto close alerts
 

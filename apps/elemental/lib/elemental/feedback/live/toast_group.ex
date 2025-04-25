@@ -193,7 +193,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
         id={@id}
         dash={@dash}
         soft={@soft}
-        flash={@flash}
+        flash={@flashes}
         outline={@outline}
         phx-update="stream"
         phx-target={@myself}
