@@ -1,6 +1,12 @@
 defmodule Elemental.Feedback.Alert do
   @moduledoc """
+  An alert display component. Can display arbitrary content shown as an
+  alert. Alerts can have multiple types each styled appropriately.
 
+  This component is mostly meant as a building block, for a more complete
+  toast/alerting/messaging component checkout `Elemental.Feedback.Toast`
+  which builds on top of this component to provide a toast-group/flash
+  system.
   """
 
   use Elemental.Component
@@ -37,9 +43,7 @@ defmodule Elemental.Feedback.Alert do
   attr :rest, :global
   slot :inner_block, required: true, doc: ""
 
-  @doc """
-
-  """
+  @doc "> The primary alert component."
   def alert(assigns) do
     ~H"""
     <div

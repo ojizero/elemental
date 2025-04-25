@@ -206,8 +206,8 @@ defmodule Elemental.Feedback.Toast do
   def toast_group(assigns) do
     assigns = normalize_toast_group(assigns)
 
-    # TODO: compatibility with phoenix flashes -- send clear message
     # TODO: auto close alerts
+    # TODO: add transition when hiding (possibly go back to JS.hide ?)
 
     ~H"""
     <.toast id={@id} placement={@placement} phx-update={@phx_update}>
