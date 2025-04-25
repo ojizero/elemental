@@ -67,7 +67,12 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   ## Client/external API
 
   @type level :: :info | :warning | :success | :error | String.t()
-  @type message :: String.t() | {level, String.t()} | {level, String.t(), String.t()}
+  @type message ::
+          String.t()
+          | {level, String.t()}
+          | {level, String.t(), String.t()}
+          # Technically the way to pass message with a title in the default style
+          | {nil, String.t(), String.t()}
 
   @doc """
   Send a message to the associated live toast group.
@@ -138,18 +143,18 @@ defmodule Elemental.Feedback.Live.ToastGroup do
        default: @default_toast_group_id,
        doc: "The ID used for the toast group component."
 
-  # attr :flash,
-  #      :map,
-  #      default: %{},
-  #      doc: """
-  #      In order to provide compatibility with Phoenix' flash subsystem we accept a
-  #      flash attribute as defined by Phoenix and do render it right after the
-  #      messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
-  #
-  #      Flash messages will only emit an `lv:clear-flash` event when cleared without
-  #      a predefined target. This is to stay inline with how Phoenix expects those
-  #      to behave.
-  #      """
+  attr :flashes,
+       :map,
+       default: %{},
+       doc: """
+       Used here since `flash` is reserved by LiveView and we can't assign it in LiveComponents.
+
+       This is effectively just a passthrough for `flash` for the underlying
+       `Elemental.Feedback.Toast.toast_group/1`.
+
+       When used messages in it will emit LiveView's `lv:clear-flash` whenever cleared meaning
+       their original behaviour should stay uninterrupted by our logic.
+       """
 
   attr :placement,
        :string,
@@ -222,8 +227,12 @@ defmodule Elemental.Feedback.Live.ToastGroup do
     |> then(&{:ok, &1})
   end
 
-  def update(assigns, socket),
-    do: {:ok, assign(socket, assigns)}
+  def update(assigns, socket) do
+    assigns
+    |> rename_flash()
+    |> then(fn assigns -> assign(socket, assigns) end)
+    |> then(&{:ok, &1})
+  end
 
   @doc false
   @impl Phoenix.LiveComponent
@@ -238,4 +247,14 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   def handle_event(_event, _params, socket), do: {:noreply, socket}
 
   defp container_id(id), do: "#{id}-component-root"
+
+  # This way we keep out API using "flash" while not conflicting
+  # with Phoenix' internals in anyway.
+  defp rename_flash(%{flash: flash} = assigns) do
+    assigns
+    |> Map.delete(:flash)
+    |> Map.put(:flashes, flash)
+  end
+
+  defp rename_flash(assigns), do: assigns
 end

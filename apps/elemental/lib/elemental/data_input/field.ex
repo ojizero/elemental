@@ -353,7 +353,13 @@ defmodule Elemental.DataInput.Field do
     # This is specific to dropdown to cleanup it's style and
     # make it usable since the scroll behaviour is for
     # inner badges and not for the field.
-    classes_to_remove = Dropdown.empty_classes()
+    #
+    # The exception to this is the list-none style which we
+    # don't want to add to the parent field component.
+    classes_to_remove =
+      Dropdown.empty_classes()
+      |> String.replace("list-none", "")
+      |> String.trim()
 
     assigns
     |> Dropdown.component_classes()

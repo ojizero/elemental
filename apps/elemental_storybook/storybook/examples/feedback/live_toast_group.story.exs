@@ -45,32 +45,37 @@ defmodule Elemental.Storybook.Components.Feedback.Live.ToastGroup do
 
     <div>
       <.form for={%{}} phx-submit="send-toast" phx-change="changed">
-        <div class="flex flex-col gap-2 w-50">
-          <.field type="dropdown" name="placement" options={@placements}>
+        <div class="flex flex-col gap-2 w-fit">
+          <.field
+            type="dropdown"
+            name="placement"
+            options={@placements}
+            value="top-end"
+            disable-validator
+          >
             <:label value="Placement" />
           </.field>
           <.field
             type="dropdown"
             name="type"
-            value="default"
+            value=""
             options={[
-              {"Default", "default"},
+              {"Default", ""},
               {"Success", "success"},
               {"Info", "info"},
               {"Warning", "warning"},
               {"Error", "error"}
             ]}
-            class="w-full"
+            disable-validator
           >
             <:label value="Type" />
           </.field>
-          <.field name="title" class="w-full">
+          <.field name="title" placeholder="The message title" disable-validator>
             <:label value="Title" />
           </.field>
-          <.field name="notice" class="w-full">
-            <:label value="Message" />
+          <.field name="notice" placeholder="The message content" disable-validator>
+            <:label value="Content" />
           </.field>
-
           <.button>Send toast</.button>
         </div>
       </.form>
@@ -81,9 +86,29 @@ defmodule Elemental.Storybook.Components.Feedback.Live.ToastGroup do
   @impl Phoenix.LiveView
   def handle_event(event, params, socket)
 
-  def handle_event("send-toast", %{"notice" => message, "title" => title, "type" => type}, socket) do
-    level = if type != "default", do: type, else: nil
-    title = if title != "", do: title, else: nil
+  def handle_event("send-toast", %{"notice" => message, "title" => "", "type" => ""}, socket) do
+    ToastGroup.send_message(message)
+    {:noreply, socket}
+  end
+
+  def handle_event("send-toast", %{"notice" => message, "title" => title, "type" => ""}, socket)
+      when title != "" do
+    ToastGroup.send_message({nil, title, message})
+    {:noreply, socket}
+  end
+
+  def handle_event("send-toast", %{"notice" => message, "title" => "", "type" => level}, socket)
+      when level != "" do
+    ToastGroup.send_message({level, message})
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "send-toast",
+        %{"notice" => message, "title" => title, "type" => level},
+        socket
+      )
+      when title != "" and level != "" do
     ToastGroup.send_message({level, title, message})
     {:noreply, socket}
   end

@@ -104,18 +104,18 @@ defmodule Elemental.Feedback.Toast do
        > coming from the stream must respect the defined typings for the message items.
        """
 
-  # attr :flash,
-  #      :map,
-  #      default: %{},
-  #      doc: """
-  #      In order to provide compatibility with Phoenix' flash subsystem we accept a
-  #      flash attribute as defined by Phoenix and do render it right after the
-  #      messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
-  #
-  #      Flash messages will ignore the `on-clear` and `phx-target` and instead emit
-  #      an `lv:clear-flash` event when cleared without a predefined target. This
-  #      is to stay inline with how Phoenix expects those to behave.
-  #      """
+  attr :flash,
+       :map,
+       default: %{},
+       doc: """
+       In order to provide compatibility with Phoenix' flash subsystem we accept a
+       flash attribute as defined by Phoenix and do render it right after the
+       messages passed in `Elemental.Feedback.Toast.toast_group/1` style.
+
+       Flash messages will ignore the `on-clear` and `phx-target` and instead emit
+       an `lv:clear-flash` event when cleared without a predefined target. This
+       is to stay inline with how Phoenix expects those to behave.
+       """
 
   attr :placement,
        :string,
@@ -154,7 +154,6 @@ defmodule Elemental.Feedback.Toast do
        default: false,
        doc: "Render the alert in soft style."
 
-  #  TODO: document?
   attr :"phx-target", :any, default: nil, doc: false
   attr :"phx-update", :any, default: nil, doc: false
 

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../../../elemental/assets/css/elemental.css";
 
 /* Enforce light mode here for now, main focus is functionality not storybook's theming */
 @plugin "../vendor/daisyui" {

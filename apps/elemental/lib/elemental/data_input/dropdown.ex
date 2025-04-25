@@ -405,12 +405,12 @@ defmodule Elemental.DataInput.Dropdown do
   @doc false
   def component_classes(assigns) do
     [
-      "select overflow-scroll m-1 gap-1",
+      "select overflow-scroll m-1 gap-1 list-none",
       assigns[:color] && "select-#{assigns.color}",
       assigns[:size] && "select-#{assigns.size}"
     ]
   end
 
   @doc false
-  def empty_classes, do: "overflow-scroll m-1 gap-1"
+  def empty_classes, do: "overflow-scroll m-1 gap-1 list-none"
 end
