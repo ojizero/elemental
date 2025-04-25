@@ -6,6 +6,45 @@ defmodule Elemental.Feedback.Live.ToastGroup do
 
   Renders a live/stateful `Elemental.Feedback.Toast.toast_group/1` and attaches
   multiple handler to allow for dynamic handling of toast messages.
+
+  ## Usage
+
+  In your application where you want to add the toast sub-system simply add
+
+      <.live_component module={Elemental.Feedback.Live.ToastGroup} />
+
+  Additionally, the main `Elemental.Feedback.Toast.toast_group/1` supports the
+  `live` attribute allowing it to act as a pass through, this simplifies
+  things to doing
+
+      <Elemental.Feedback.Toast.toast_group live>
+
+  The second form can further be simplified if you `use Elemental` to just
+
+      <.toast_group live />
+
+  To send a message you can use the `send_message/2` function or you can
+  send a list of messages by using the `send_messages/2` function.
+
+  Those functions abstract away all the details needed and require you
+  only optionally pass it an `id` option to the live toast group if
+  you have many in your application.
+
+      defmodule MyPage do
+        # your normal app setup
+
+        use Elemental
+        # or alias Elemental.Feedback.Live.ToastGroup
+
+        # your normal page implementation
+
+        def handle_event("some-event", params, socket) do
+          # handle your event normally
+          # now you can send the user a toast by calling
+          ToastGroup.send_message("Some notice to the user")
+        end
+
+      end
   """
 
   use Elemental.Component, :live
@@ -69,6 +108,10 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   @doc """
   Drop-in for Phoenix' `Phoenix.LiveView.put_flash/3` that instead sends the
   message over via the handles of the live toast group.
+
+  This captures the original behaviour and doesn't set the Phoenix flash
+  related assigns instead passing it directly (and as is) to the main
+  `Elemental.Feedback.Toast.toast_group/1` component as a message.
   """
   @spec put_flash(Phoenix.LiveView.Socket.t(), String.t() | atom, String.t()) ::
           Phoenix.LiveView.Socket.t()
@@ -130,19 +173,21 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   @impl Phoenix.LiveComponent
   def render(assigns) do
     ~H"""
-    <.toast_group
-      id={@id}
-      dash={@dash}
-      soft={@soft}
-      flash={@flash}
-      outline={@outline}
-      phx-update="stream"
-      phx-target={@myself}
-      on-clear={@on_clear}
-      placement={@placement}
-      messages={@stream.messages}
-      phoenix-errors={@phoenix_errors}
-    />
+    <div id={@id <> "-live-component"}>
+      <.toast_group
+        id={@id}
+        dash={@dash}
+        soft={@soft}
+        flash={@flash}
+        outline={@outline}
+        phx-update="stream"
+        phx-target={@myself}
+        on-clear={@on_clear}
+        placement={@placement}
+        messages={@streams.messages}
+        phoenix-errors={@phoenix_errors}
+      />
+    </div>
     """
   end
 

@@ -79,10 +79,14 @@ defmodule Elemental.Feedback.Toast do
 
   attr :messages,
        :any,
-       required: true,
        doc: """
-       The list of messages to display in the group, each message in the list
-       must be one type as one of the following;
+       The list of messages to display in the group, ignored if `live` is enabled.
+       Required otherwise.
+
+       ## Type
+
+       Accepts either a list or a `Phoenix.LiveView.LiveStream`, with each item standing
+       for a message and must be one type as one of the following;
 
        1. `String.t` indicating the message is simply some text context to display. No
           title is displayed for it and it will be shown in the default alert style.
@@ -98,8 +102,6 @@ defmodule Elemental.Feedback.Toast do
 
        > This list of messages can also be provided from a LiveView stream, where each item
        > coming from the stream must respect the defined typings for the message items.
-
-       > Ignored if `live` is enabled.
        """
 
   attr :flash,
