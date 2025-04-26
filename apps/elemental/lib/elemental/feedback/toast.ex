@@ -6,6 +6,38 @@ defmodule Elemental.Feedback.Toast do
   Provides a set of dead/stateless components for use to operate displaying
   informative messages, with a simplified API that augments Phoenix'
   flashes.
+
+  ## Usage
+
+  The most bare bones component provided is the `toast/1` component
+  which is meant as a building block container for placing toasts
+  generally speaking based on Daisy's `toast` component
+
+      <.toast>
+        You toast content here
+      </.toast>
+
+  For toast message use cases we provide the `toast_group/1` component
+  which given a list of messages will display them stacked in a `toast/1`
+  component under the `Elemental.Feedback.Alert.alert/1` component.
+
+      <.toast_group messages={["Some message"]} />
+
+  Additionally we provide a compatibility component `flash_group/1`
+  as a drop in for Phoenix' generated component
+
+      <.flash_group flash={@flash} />
+
+  ## Live component
+
+  We provide a live/stateful component for toast groups under
+  `Elemental.Feedback.Live.ToastGroup`, this can be accessed
+  by passing the `live` attribute to `toast_group/1`
+
+      <.toast_group live />
+
+  The live variant allows for sending messages from the server side
+  programmatically/dynamically.
   """
 
   use Elemental.Component
@@ -26,6 +58,7 @@ defmodule Elemental.Feedback.Toast do
 
   slot :inner_block, required: true
 
+  attr :class, :any, default: nil, doc: false
   attr :rest, :global
 
   @doc """
@@ -35,7 +68,17 @@ defmodule Elemental.Feedback.Toast do
   This is meant more as a building block for composing more complete/complex
   toast messages/overlays.
 
-  You probably want to use `toast_group/1` if you want to display simple messages.
+  You probably want to use `toast_group/1` if you want to display simple
+  messages.
+
+  ## Caveat
+
+  Note that if you place two toasts with the same placement there will
+  be no guarantee from the component on which comes on top, probably
+  the second to show in the DOM tree will.
+
+  This is by design as it's intended to use one toast per placement
+  (or even per page).
   """
   def toast(assigns) do
     [vertical, horizontal] = String.split(assigns.placement, "-")
@@ -48,7 +91,8 @@ defmodule Elemental.Feedback.Toast do
         "toast",
         "toast-#{@vertical}",
         "toast-#{@horizontal}",
-        "z-100"
+        "z-100",
+        @class
       ]}
       {@rest}
     >
@@ -164,9 +208,11 @@ defmodule Elemental.Feedback.Toast do
 
   > This component is intended for building toast/flash messaging systems.
 
-  This component doesn't respect Phoenix' default flashes API, for that use
-  instead the `flash_group/1` component which provides an adapter layer to
-  allow seamless integration with Phoenix' flash system.
+  This component doesn't respect Phoenix' default flashes API by default,
+  however you can pass Phoenix' flash into the `flash` attribute to
+  display Phoenix' flashes inlined, immediately after normal
+  messages. For a more seamless integration you can use
+  the `flash_group/1` component.
 
   ## Caveats
 
@@ -217,7 +263,7 @@ defmodule Elemental.Feedback.Toast do
         message={message}
         outline={@outline}
         dash={@dash}
-        soft={@dash}
+        soft={@soft}
         clear_alert_event={@clear_alert_event}
         phx-target={@phx_target}
       />
@@ -227,10 +273,10 @@ defmodule Elemental.Feedback.Toast do
         message={{"#{kind}", message}}
         outline={@outline}
         dash={@dash}
-        soft={@dash}
+        soft={@soft}
         clear_alert_event="lv:clear-flash"
       />
-      <.phoenix_messages :if={@phoenix_errors} outline={@outline} dash={@dash} soft={@dash} />
+      <.phoenix_messages :if={@phoenix_errors} outline={@outline} dash={@dash} soft={@soft} />
     </.toast>
     """
   end

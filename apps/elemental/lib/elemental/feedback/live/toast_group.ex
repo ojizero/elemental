@@ -17,7 +17,7 @@ defmodule Elemental.Feedback.Live.ToastGroup do
   `live` attribute allowing it to act as a pass through, this simplifies
   things to doing
 
-      <Elemental.Feedback.Toast.toast_group live>
+      <Elemental.Feedback.Toast.toast_group live />
 
   The second form can further be simplified if you `use Elemental` to just
 
