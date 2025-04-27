@@ -65,52 +65,6 @@ defmodule Elemental.Storybook.Components.Feedback.ToastGroup do
           """
         ]
       }
-      # %Variation{
-      #   id: :info,
-      #   attributes: %{
-      #     messages: [{"info", "Is this informative?"}],
-      #     "phoenix-errors": false
-      #   }
-      # },
-      # %Variation{
-      #   id: :warning,
-      #   attributes: %{
-      #     messages: [{"warning", "Hopefully it's not a bad API!"}],
-      #     "phoenix-errors": false
-      #   }
-      # },
-      # %Variation{
-      #   id: :error,
-      #   attributes: %{
-      #     messages: [{"error", "Hoping this isn't a failure!"}],
-      #     "phoenix-errors": false
-      #   }
-      # },
-      # %Variation{
-      #   id: :stacked,
-      #   attributes: %{
-      #     messages: [
-      #       "Hey!",
-      #       {"success", "These toasts"},
-      #       {"success", "can actually"},
-      #       {"info", "be arbitrarily"},
-      #       {"warning", "stacked,"},
-      #       {"error", "is that cool?"}
-      #     ],
-      #     "phoenix-errors": false
-      #   }
-      # },
-      # %Variation{
-      #   id: :supports_flash,
-      #   attributes: %{
-      #     messages: [],
-      #     flash: %{
-      #       info: "My info flash!",
-      #       error: "My error flash!"
-      #     },
-      #     "phoenix-errors": false
-      #   }
-      # }
     ]
   end
 end

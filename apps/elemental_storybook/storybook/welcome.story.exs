@@ -14,8 +14,7 @@ defmodule Elemental.Storybook.MyPage do
     ]
   end
 
-
-  def render(%{tab: :welcome}=assigns) do
+  def render(%{tab: :welcome} = assigns) do
     ~H"""
     <div class="psb-welcome-page">
       <p>

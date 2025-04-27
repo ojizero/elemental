@@ -53,6 +53,7 @@ defmodule Elemental.Component do
 
   @doc false
   # We treat "ghost" style as a color
+  # TODO: having ghost here isn't super valid in hind sight
   def daisy_colors, do: ~w(ghost neutral primary secondary accent info success warning error)
 
   @doc false
