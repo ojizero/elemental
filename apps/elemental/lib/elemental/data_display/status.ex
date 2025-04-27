@@ -1,4 +1,4 @@
-defmodule Elemental.Feedback.Status do
+defmodule Elemental.DataDisplay.Status do
   use Elemental.Component
 
   attr :size, :string, required: false, values: daisy_sizes(), doc: ""
