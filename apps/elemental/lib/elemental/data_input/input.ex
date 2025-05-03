@@ -96,7 +96,7 @@ defmodule Elemental.DataInput.Input do
        doc: "The input's size class to use."
 
   attr :class,
-       :string,
+       :any,
        default: nil,
        doc: "Additional CSS classes to pass to the input."
 
@@ -321,7 +321,7 @@ defmodule Elemental.DataInput.Input do
        doc: "The checkbox's size."
 
   attr :class,
-       :string,
+       :any,
        default: nil,
        doc: "Additional CSS classes to pass to the checkbox."
 
@@ -364,7 +364,7 @@ defmodule Elemental.DataInput.Input do
        doc: "The radio's size."
 
   attr :class,
-       :string,
+       :any,
        default: nil,
        doc: "Additional CSS classes to pass to the radio."
 

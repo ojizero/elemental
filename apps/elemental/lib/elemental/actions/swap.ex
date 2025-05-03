@@ -46,16 +46,18 @@ defmodule Elemental.Actions.Swap do
     once it first mounts.
     """
 
-  attr :id, :any, doc: false
+  attr :id, :any, required: false, doc: false
   attr :rest, :global, doc: false
 
   @doc "> The primary swap component."
   def swap(assigns) do
     assigns =
-      update(assigns, :animate, fn
+      assigns
+      |> update(:animate, fn
         "default" -> nil
         otherwise -> otherwise
       end)
+      |> assign_new(:id, fn -> random() end)
 
     ~H"""
     <label
