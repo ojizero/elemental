@@ -1,5 +1,27 @@
 import Config
 
+config :tailwind,
+  version: "4.1.0",
+  storybook: [
+    args: ~w(
+      --input=assets/css/storybook.css
+      --output=priv/static/assets/storybook.css
+    ),
+    cd: Path.expand("../apps/elemental_storybook", __DIR__)
+  ]
+
+config :esbuild,
+  version: "0.25.0",
+  storybook: [
+    args: ~w(
+      assets/js/storybook.js
+      --bundle
+      --sourcemap=inline
+      --outdir=priv/static/assets
+    ),
+    cd: Path.expand("../apps/elemental_storybook", __DIR__)
+  ]
+
 config :elemental_storybook,
   generators: [timestamp_type: :utc_datetime]
 
@@ -23,8 +45,6 @@ config :phoenix, :json_library, Jason
 config :elemental, Storybook,
   compilation_mode: :lazy,
   compilation_debug: true
-
-import_config "assets_config.exs"
 
 if config_env() in ~w(dev prod)a,
   do: import_config("#{config_env()}.exs")

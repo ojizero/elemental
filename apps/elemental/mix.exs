@@ -50,11 +50,6 @@ defmodule Elemental.MixProject do
   end
 
   defp aliases do
-    [
-      "assets.build": ["tailwind elemental", "esbuild elemental"],
-      "assets.release": ["tailwind elemental --minify", "esbuild elemental --minify"],
-      # TODO: needs improvement later.
-      release: ["assets.release", "hex.publish"]
-    ]
+    []
   end
 end
