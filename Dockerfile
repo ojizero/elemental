@@ -33,6 +33,7 @@ COPY apps/elemental/package.json ./apps/elemental/package.json
 COPY apps/elemental_storybook/assets ./apps/elemental_storybook/assets
 COPY apps/elemental_storybook/lib ./apps/elemental_storybook/lib
 COPY apps/elemental_storybook/priv ./apps/elemental_storybook/priv
+COPY apps/elemental_storybook/storybook apps/elemental_storybook/storybook
 
 RUN mix assets.deploy
 RUN mix compile
@@ -59,7 +60,6 @@ RUN chown nobody /app
 ENV MIX_ENV="prod"
 
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/storybook ./
-COPY --chown=nobody:root apps/elemental_storybook/storybook storybook
 
 USER nobody
 
