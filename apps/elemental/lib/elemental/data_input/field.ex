@@ -120,6 +120,7 @@ defmodule Elemental.DataInput.Field do
        > **Ignored** of `for` attribute is set.
        """
 
+  #  TODO: make module with configurable adapters for translations
   attr :"error-translator",
        {:fun, 1},
        default: &Function.identity/1,
@@ -310,7 +311,15 @@ defmodule Elemental.DataInput.Field do
       <label class={classes(assigns)}>
         <.overlay :for={slot <- @start_edge} slot={slot} />
         <.overlay :for={slot <- @start_center} slot={slot} />
-        <.wrapped_component {cleanup_assigns(assigns)} />
+        <%!--
+        Using function call instead of component invocation since  it's
+        not recommended to pass assigns wholesale to with component
+        invocations.
+
+        Ref: https://hexdocs.pm/phoenix_live_view/assigns-eex.html#the-assigns-variable
+        --%>
+        {assigns |> cleanup_assigns() |> wrapped_component()}
+        <%!-- <.wrapped_component {cleanup_assigns(assigns)} /> --%>
         <.overlay :for={slot <- @end_center} slot={slot} />
         <.overlay :for={slot <- @end_edge} slot={slot} />
       </label>
