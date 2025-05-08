@@ -1,5 +1,8 @@
 import Config
 
+apps_dir = Path.expand("../apps", __DIR__)
+storybook_dir = Path.expand("../apps/elemental_storybook", __DIR__)
+
 config :tailwind,
   version: "4.1.0",
   storybook: [
@@ -7,7 +10,8 @@ config :tailwind,
       --input=assets/css/storybook.css
       --output=priv/static/assets/storybook.css
     ),
-    cd: Path.expand("../apps/elemental_storybook", __DIR__)
+    cd: storybook_dir,
+    env: %{"NODE_PATH" => apps_dir}
   ]
 
 config :esbuild,
@@ -19,7 +23,8 @@ config :esbuild,
       --sourcemap=inline
       --outdir=priv/static/assets
     ),
-    cd: Path.expand("../apps/elemental_storybook", __DIR__)
+    cd: storybook_dir,
+    env: %{"NODE_PATH" => apps_dir}
   ]
 
 config :elemental_storybook,

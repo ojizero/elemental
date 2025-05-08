@@ -30,7 +30,7 @@ defmodule Elemental.DataDisplay.Status do
       "status",
       assigns[:size] && "status-#{@size}",
       assigns[:color] && "status-#{@color}",
-      assigns[:animate] && "status-#{@animate}"
+      assigns[:animate] && "animate-#{@animate}"
     ]}>
     </span>
     """

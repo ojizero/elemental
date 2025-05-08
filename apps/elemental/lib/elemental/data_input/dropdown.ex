@@ -1,6 +1,11 @@
 # TODO: "dropdowns" are classified as "actions" in Daisy docs
 #       however this dropdown is more of a "dropdown-select"
 #       should we rename it instead?
+# TODO: move to popover? polyfill needed for non-chrome to work correctly
+
+# TODO: with search highlight first item and if enter is clicked select it
+# TODO: on windows it shows the scrollbars due to the overflow
+
 defmodule Elemental.DataInput.Dropdown do
   @moduledoc """
   > An abstraction around DaisyUI's dropdown.
@@ -402,15 +407,18 @@ defmodule Elemental.DataInput.Dropdown do
   defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
   defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"
 
+  @base_style "overflow-scroll el-hide-scrollbar m-1 gap-1 list-none"
+
   @doc false
   def component_classes(assigns) do
     [
-      "select overflow-scroll m-1 gap-1 list-none",
+      "select",
+      @base_style,
       assigns[:color] && "select-#{assigns.color}",
       assigns[:size] && "select-#{assigns.size}"
     ]
   end
 
   @doc false
-  def empty_classes, do: "overflow-scroll m-1 gap-1 list-none"
+  def empty_classes, do: @base_style
 end

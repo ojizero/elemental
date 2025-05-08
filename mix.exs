@@ -25,6 +25,11 @@ defmodule ElementalUmbra.MixProject do
   end
 
   defp releases do
-    [storybook: [applications: [elemental_storybook: :permanent]]]
+    [
+      storybook: [
+        applications: [elemental_storybook: :permanent],
+        strip_beams: [keep: ["Docs"]]
+      ]
+    ]
   end
 end
