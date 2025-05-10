@@ -4,5 +4,6 @@
   "version": "0.2.0",
   "description": "A Tailwind and DaisyUI based Phoenix components library.",
   "license": "MIT",
-  "module": "assets/js/hooks/index.js"
+  "main": "assets/js/index.js",
+  "module": "assets/js/index.js"
 }
