@@ -22,7 +22,7 @@ defmodule Elemental.Storybook.Components.Actions.Modal do
           """
         ],
         template: """
-        <.button phx-click={show_modal(":variation_id")}>open modal</.button>
+        <.button phx-click={show_modal(":variation_id")}>Open modal</.button>
         <.psb-variation />
         """
       }
