@@ -2,12 +2,3 @@
 @utility el-hide-scrollbar {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
-
-/* Ref: https://github.com/tailwindlabs/tailwindcss/discussions/16744#discussion-8002518 */
-@utility el-scrollbar-hidden {
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
