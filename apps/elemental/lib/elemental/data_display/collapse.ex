@@ -60,7 +60,7 @@ defmodule Elemental.DataDisplay.Collapse do
 
     ~H"""
     <div
-      tabindex="0"
+      tabindex={if not @click_to_close, do: "0"}
       class={[
         "collapse border bg-base-100 border-base-300",
         @indicator != "none" && "collapse-#{@indicator}",
@@ -76,7 +76,7 @@ defmodule Elemental.DataDisplay.Collapse do
   end
 
   defp normalize_assigns(assigns) do
-    assign(assigns, :click_to_close, fn
+    assign_new(assigns, :click_to_close, fn
       %{group: nil, "click-to-close": click_to_close} -> click_to_close
       # If the collapse is placed in a group then it's always gonna close with focus
       _otherwise -> false
