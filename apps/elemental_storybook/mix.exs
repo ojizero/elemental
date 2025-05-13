@@ -6,7 +6,7 @@ defmodule ElementalStorybook.MixProject do
       app: :elemental_storybook,
       deps: deps(),
       aliases: aliases(),
-      version: "0.3.0",
+      version: "0.3.1",
       elixir: "~> 1.17",
       elixirc_paths: ~w(lib),
       start_permanent: Mix.env() == :prod,
