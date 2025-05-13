@@ -4,7 +4,7 @@ defmodule Elemental.MixProject do
   def project do
     [
       app: :elemental,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.17",
       description: "A Tailwind and DaisyUI based Phoenix components library.",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -20,7 +20,6 @@ defmodule Elemental.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(:dev), do: ["lib", "storybook/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
@@ -30,10 +29,9 @@ defmodule Elemental.MixProject do
   defp package do
     %{
       name: :elemental,
-      files: ~w(mix.exs package.json lib priv LICENCE README.md),
+      files: ~w(mix.exs package.json lib ../../LICENCE ../../README.md),
       links: %{"GitHub" => "https://github.com/ojizero/elemental"},
-      licenses: ["MIT"],
-      exclude_patterns: ~w(storybook*)
+      licenses: ["MIT"]
     }
   end
 
