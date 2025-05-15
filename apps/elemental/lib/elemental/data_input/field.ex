@@ -43,8 +43,8 @@ defmodule Elemental.DataInput.Field do
   Details on overlay documentation and overall field structure
   see `Elemental.DataInput.Field.field/1`.
 
-  All attributes defined in `Elemental.DataInput.Input.input/1`, `Elemental.DataInput.Dropdown.dropdown/1`,
-  and `Elemental.DataInput.Select.select/1` are supported by fields and are just passed
+  All attributes defined in `Elemental.DataInput.Input.input/1`, `Elemental.DataInput.Select.select/1`,
+  Elemental.DataInput.Select are supported by fields and are just passed
   over to their respective implementation.
   """
 
@@ -52,7 +52,6 @@ defmodule Elemental.DataInput.Field do
 
   alias Elemental.DataInput.Input
   alias Elemental.DataInput.Select
-  alias Elemental.DataInput.Dropdown
 
   # TODO: ensure error with defined class works, else use `text-error`
   # TODO: fix select behaviour
@@ -69,7 +68,7 @@ defmodule Elemental.DataInput.Field do
 
        ## Types
 
-       - `dropdown` powered by `Elemental.DataInput.Dropdown.dropdown/1`.
+       - `dropdown` powered by `Elemental.DataInput.Select.select/1`.
        - `select` powered by `Elemental.DataInput.Select.select/1`.
        - Any value supported by `Elemental.DataInput.Input.input/1`.
        """
@@ -105,9 +104,9 @@ defmodule Elemental.DataInput.Field do
 
        ## Types
 
-       - `dropdown` - as defined in `Element.Dropdown.dropdown/1`
-       - `select` - as defined in `Element.Select.select/1`
-       - Otherwise as defined in `Element.Input.input/1`
+       - `dropdown` - as defined in `Element.DataInput.Select.select/1`
+       - `select` - as defined in `Element.DataInput.Select.select/1`
+       - Otherwise as defined in `Element.DataInput.Input.input/1`
        """
 
   attr :errors,
@@ -145,28 +144,28 @@ defmodule Elemental.DataInput.Field do
 
   ## Dropdown only attributes
 
-  attr :multi, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+  attr :multi, :boolean, default: false, doc: "See `Elemental.DataInput.Select.select/1`."
 
   attr :searchable, :boolean,
     default: false,
-    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Select.select/1`."
 
   attr :"searchable-inline", :boolean,
     default: false,
-    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Select.select/1`."
 
-  attr :hover, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
-  attr :open, :boolean, default: false, doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+  attr :hover, :boolean, default: false, doc: "See `Elemental.DataInput.Select.select/1`."
+  attr :open, :boolean, default: false, doc: "See `Elemental.DataInput.Select.select/1`."
 
   attr :align, :string,
     default: "start",
     values: ~w(start center end),
-    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Select.select/1`."
 
   attr :from, :string,
     default: "bottom",
     values: ~w(top bottom left right),
-    doc: "See `Elemental.DataInput.Dropdown.dropdown/1`."
+    doc: "See `Elemental.DataInput.Select.select/1`."
 
   ## Input only attributes
 
@@ -185,20 +184,18 @@ defmodule Elemental.DataInput.Field do
 
   attr :multiple, :boolean,
     required: false,
-    doc: "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Input.input/1`."
+    doc: "See `Elemental.DataInput.Select.select/1` and `Elemental.DataInput.Input.input/1`."
 
   ## Dropdown and select shared attributes
 
   attr :options,
        :list,
        required: false,
-       doc:
-         "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Select.select/1`."
+       doc: "See `Elemental.DataInput.Select.select/1`."
 
   attr :prompt, :string,
     default: nil,
-    doc:
-      "See `Elemental.DataInput.Dropdown.dropdown/1` and `Elemental.DataInput.Select.select/1`."
+    doc: "See `Elemental.DataInput.Select.select/1`."
 
   slot :overlay,
     doc: """
@@ -330,21 +327,31 @@ defmodule Elemental.DataInput.Field do
     """
   end
 
-  defp wrapped_component(%{type: "select"} = assigns),
-    do: ~H"<Select.select {assigns} elemental-disable-styles />"
+  defp wrapped_component(%{type: "select"} = assigns) do
+    assigns = assign(assigns, native: true, "elemental-disable-styles": true)
 
-  defp wrapped_component(%{type: "dropdown"} = assigns),
-    do: ~H"<Dropdown.dropdown {assigns} elemental-disable-styles />"
+    ~H"{Select.select(assigns)}"
+  end
+
+  defp wrapped_component(%{type: "dropdown"} = assigns) do
+    assigns = assign(assigns, native: false, "elemental-disable-styles": true)
+
+    ~H"{Select.select(assigns)}"
+  end
 
   defp wrapped_component(%{type: type} = assigns)
        when type in ~w(checkbox color radio range),
-       do: ~H"<Input.input {assigns} />"
+       do: ~H"{Input.input(assigns)}/>"
 
   defp wrapped_component(assigns) do
     # Ref: https://github.com/saadeghi/daisyui/issues/250#issuecomment-1056107620
-    ~H"""
-    <Input.input {assigns} class="focus:border-primary focus:outline-none" elemental-disable-styles />
-    """
+    assigns =
+      assign(assigns,
+        class: "focus:border-primary focus:outline-none",
+        "elemental-disable-styles": true
+      )
+
+    ~H"{Input.input(assigns)}"
   end
 
   @doc false
@@ -366,12 +373,12 @@ defmodule Elemental.DataInput.Field do
     # The exception to this is the list-none style which we
     # don't want to add to the parent field component.
     classes_to_remove =
-      Dropdown.empty_classes()
+      Select.empty_classes()
       |> String.replace("list-none", "")
       |> String.trim()
 
     assigns
-    |> Dropdown.component_classes()
+    |> Select.component_classes()
     |> Enum.map(fn
       nil -> nil
       classes -> String.replace(classes, classes_to_remove, "")

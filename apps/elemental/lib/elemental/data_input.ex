@@ -6,7 +6,6 @@ defmodule Elemental.DataInput do
       import Elemental.DataInput.Field
       import Elemental.DataInput.Input
       import Elemental.DataInput.Select
-      import Elemental.DataInput.Dropdown
     end
   end
 end
