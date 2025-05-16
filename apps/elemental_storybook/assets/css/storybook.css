@@ -3,7 +3,7 @@
 
 /* Enforce light mode here for now, main focus is functionality not storybook's theming */
 @plugin "../vendor/daisyui" {
-  themes: light --default
+  themes: light --default;
 }
 
 @source "../../../../";
@@ -21,7 +21,7 @@
 @source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge}-{outline,dash,soft}");
 
 /* Safe list all Daisy sizes */
-@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge,chat-bubble,status,link,step,alert,loading,progress,tooltip,checkbox,file,radio,range,select,input,textarea,toggle,divider}-{xs,sm,md,lg,xl}");
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{btn,badge,chat-bubble,status,link,step,alert,loading,progress,tooltip,checkbox,file,radio,range,select,input,textarea,toggle,divider,shadow}-{xs,sm,md,lg,xl}");
 
 /* Safe list status animations */
 @source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}animate-{spin,ping,pulse,bounce}");

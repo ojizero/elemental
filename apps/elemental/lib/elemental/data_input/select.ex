@@ -1,17 +1,9 @@
-# TODO: "dropdowns" are classified as "actions" in Daisy docs
-#       however this dropdown is more of a "dropdown-select"
-#       should we rename it instead?
-# Make this a "dropdown" action mainly used for dropdowns only &
-# split this input logic into a "select" component with a native
-# attribute to spin up the browser native select elemtn
-#
-# TODO: move to popover? polyfill needed for non-chrome to work correctly
-
 # TODO: with search highlight first item and if enter is clicked select it
 
 defmodule Elemental.DataInput.Select do
   @moduledoc """
-  > An abstraction around DaisyUI's dropdown.
+  > An abstraction for multi-select, searchable, stateless select component,
+  > built on top of `Elemental.Actions.Dropdown`.
 
   This is implement in a manner that works drop-in in forms and uses
   only dead/stateless components with minimal JavaScript.
@@ -34,31 +26,33 @@ defmodule Elemental.DataInput.Select do
   This implementation requires JavaScript hooks for it's main behaviour,
   utilizes 3 main hooks
 
-  - `ElementalDropdownSearch` implementing filtering/search behaviour when enabled.
-  - `ElementalDropdownSingleItem` implementing prompt changes when using single item mode.
-  - `ElementalDropdownMultiItem` implementing prompt changes when using multi item mode.
+  - `ElementalSelectDropdownSearch` implementing filtering/search behaviour when enabled.
+  - `ElementalSelectSingleItem` implementing prompt changes when using single item mode.
+  - `ElementalSelectMultiItem` implementing prompt changes when using multi item mode.
 
   ## Implementation considerations
 
   The component is implemented as a dead/stateless component as to simplify it's
   usage and avoid complexities associated with live/stateful components.
 
-  This comes from my dissatisfaction with implementations I found which have behaviours
-  that I kept finding to be non-obvious and odd, from how they interact with events
-  sent to parent vs themselves, along with how they handle their states.
+  This comes from my dissatisfaction with implementations I found which have
+  behaviours that I kept finding to be non-obvious and odd, from how they interact with events sent to parent vs themselves, along with how they
+  handle their states.
 
-  Additionally the implementation aims to be drop-in compatible with forms in general
-  as well as how forms are handled in Phoenix/LiveView without requiring much fuss.
+  Additionally the implementation aims to be drop-in compatible with forms in
+  general as well as how forms are handled in Phoenix/LiveView without
+  requiring much fuss.
 
-  The behaviour relies heavily on the provided minimal JavaScript hooks, as well as
-  relying on native form behaviours with how forms deal with radio buttons and
-  checkboxes.
+  The behaviour relies heavily on the provided minimal JavaScript hooks, as well
+  as relying on native form behaviours with how forms deal with radio buttons
+  and checkboxes.
   """
 
   use Elemental.Component
 
-  alias Elemental.DataInput.Input
   alias Elemental.Actions.Button
+  alias Elemental.Actions.Dropdown
+  alias Elemental.DataInput.Input
 
   attr :options,
        :list,
@@ -121,6 +115,11 @@ defmodule Elemental.DataInput.Select do
        Renders a native `<select>` element if enabled.
 
        This option is ignored if `multi` or `multiple` options are passed.
+
+       > Multiple selection and searchability features are ignored with this.
+
+       > Styling won't be controllable and will be limited to whatever the
+       > browser does per operating system.
        """
 
   attr :multiple,
@@ -228,14 +227,11 @@ defmodule Elemental.DataInput.Select do
   attr :id, :string, required: false, doc: false
 
   @doc """
-  > The primary dropdown component.
+  > The primary select component.
 
-  This dropdown attempts to provide a fully featured dropdown/select element
+  This component attempts to provide a fully featured dropdown/select element
   with native support for searching along with multiple select mode out
   of the box.
-
-  > The API provided here works drop-in with Elemental's select
-  > component (see `Elemental.DataInput.Select`).
 
   ## Select compatibility
 
@@ -247,6 +243,8 @@ defmodule Elemental.DataInput.Select do
   > To use the browser's native `<select>` element you can pass
   > the `native` attribute.
   """
+  def select(assigns)
+
   def select(%{native: true} = assigns) do
     assigns = normalize_assigns(assigns)
 
@@ -257,7 +255,7 @@ defmodule Elemental.DataInput.Select do
         type="button"
         class="hidden"
         elemental-disable-styles
-        phx-hook="ElementalSelectLabelAdapter"
+        phx-hook="ElementalNativeSelectLabelAdapter"
       >
       </Button.button>
       <select class={classes(assigns)} id={@id <> "__select"} name={@name}>
@@ -274,71 +272,46 @@ defmodule Elemental.DataInput.Select do
     assigns = normalize_assigns(assigns)
 
     ~H"""
-    <div>
-      <Button.button
-        id={@id}
-        type="button"
-        class="hidden"
-        elemental-disable-styles
-        phx-click={
-          JS.toggle_attribute({"open", "true"},
-            to: "\##{Phoenix.HTML.css_escape("#{@id}__dropdown")}"
-          )
-        }
-      >
-      </Button.button>
-      <details
-        id={@id <> "__dropdown"}
-        class={[
-          "dropdown",
-          "dropdown-#{@align}",
-          "dropdown-#{@from}",
-          @hover && "dropdown-hover",
-          @open && "dropdown-open"
-        ]}
-        phx-click-away={JS.remove_attribute("open")}
-      >
-        <summary id={@id <> "__prompt_container"} class={classes(assigns)}>
-          <.dropdown_prompt
-            component_id={@id}
-            name={@name}
-            value={@value}
-            multi={@multi}
-            prompt={unless @searchable and @inline_search, do: @prompt}
-            options={@options}
-          />
-          <.dropdown_search
-            :if={@searchable and @inline_search}
-            component_id={@id}
-            id={@id <> "__inline_search"}
-            name={@name <> "__search"}
-            placeholder={@prompt}
-          />
-        </summary>
-        <ul
-          id={@id <> "__content"}
-          class="dropdown-content menu bg-neutral-content rounded-box z-1 w-52 p-2 shadow-sm"
-        >
-          <.dropdown_search
-            :if={@searchable and not @inline_search}
-            component_id={@id}
-            id={@id <> "__search"}
-            name={@name <> "__search"}
-            placeholder="Search"
-          />
-          <.dropdown_item
-            :for={{{label, value}, index} <- Enum.with_index(@options)}
-            component_id={@id}
-            id={@id <> "__item_#{index}"}
-            name={@name}
-            label={label}
-            value={value}
-            multi={@multi}
-            selected={value in @value}
-          />
-        </ul>
-      </details>
-    </div>
+    <Dropdown.dropdown id={@id}>
+      <:trigger class={classes(assigns)}>
+        <.dropdown_prompt
+          component_id={@id}
+          name={@name}
+          value={@value}
+          multi={@multi}
+          prompt={unless @searchable and @inline_search, do: @prompt}
+          options={@options}
+        />
+        <.dropdown_search
+          :if={@searchable and @inline_search}
+          component_id={@id}
+          id={@id <> "__inline_search"}
+          name={@name <> "__search"}
+          placeholder={@prompt}
+        />
+      </:trigger>
+
+      <%!-- TODO: move to bg-base-100 once shadow is fixed in storybook --%>
+      <ul id={@id <> "__content"} class="menu z-1 w-52 p-2 bg-neutral-content rounded-box">
+        <.dropdown_search
+          :if={@searchable and not @inline_search}
+          component_id={@id}
+          id={@id <> "__search"}
+          name={@name <> "__search"}
+          placeholder="Search"
+        />
+        <.dropdown_item
+          :for={{{label, value}, index} <- Enum.with_index(@options)}
+          component_id={@id}
+          id={@id <> "__item_#{index}"}
+          name={@name}
+          label={label}
+          value={value}
+          multi={@multi}
+          selected={value in @value}
+        />
+      </ul>
+    </Dropdown.dropdown>
     """
   end
 
@@ -406,7 +379,7 @@ defmodule Elemental.DataInput.Select do
       color="ghost"
       class="border-1 m-1 focus:outline-none"
       placeholder={@placeholder}
-      phx-hook="ElementalDropdownSearch"
+      phx-hook="ElementalSelectDropdownSearch"
       elemental-component-id={@component_id}
     />
     """
@@ -458,10 +431,10 @@ defmodule Elemental.DataInput.Select do
   defp item_type(%{multi: true}), do: "checkbox"
   defp item_type(%{multi: false}), do: "radio"
 
-  defp phx_hook(%{multi: true}), do: "ElementalDropdownMultiItem"
-  defp phx_hook(%{multi: false}), do: "ElementalDropdownSingleItem"
+  defp phx_hook(%{multi: true}), do: "ElementalSelectMultiItem"
+  defp phx_hook(%{multi: false}), do: "ElementalSelectSingleItem"
 
-  @base_style "overflow-scroll el-hide-scrollbar m-1 gap-1 list-none"
+  @base_style "overflow-scroll el-hide-scrollbar m-1 gap-1"
 
   @doc false
   def component_classes(assigns) do
