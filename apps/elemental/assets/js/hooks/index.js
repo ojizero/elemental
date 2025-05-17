@@ -1,2 +1,3 @@
-export * from "./swap";
-export * from "./select";
+export * from "./avatar"
+export * from "./swap"
+export * from "./select"

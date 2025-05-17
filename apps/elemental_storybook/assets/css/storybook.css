@@ -25,3 +25,4 @@
 
 /* Safe list status animations */
 @source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}animate-{spin,ping,pulse,bounce}");
+@source inline("{hover:,focus:,first-child:,required:,before:,after:,placeholder:,selection:,xs:,sm:,md:,lg:,xl:,}{-,}space-x-{{1..9},{10..99..1}}");
