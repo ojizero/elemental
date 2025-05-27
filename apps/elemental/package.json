@@ -1,7 +1,7 @@
 {
   "name": "elemental",
   "author": "Amir Alkam <hello@ojizero.dev>",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A Tailwind and DaisyUI based Phoenix components library.",
   "license": "MIT",
   "main": "assets/js/index.js",

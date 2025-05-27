@@ -4,7 +4,7 @@ defmodule Elemental.MixProject do
   def project do
     [
       app: :elemental,
-      version: "0.3.1",
+      version: "0.3.2",
       elixir: "~> 1.17",
       description: "A Tailwind and DaisyUI based Phoenix components library.",
       elixirc_paths: elixirc_paths(Mix.env()),
