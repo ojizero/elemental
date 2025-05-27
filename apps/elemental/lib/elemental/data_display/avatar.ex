@@ -56,6 +56,12 @@ defmodule Elemental.DataDisplay.Avatar do
        required: false,
        doc: "Additional classes to wrap the avatar with."
 
+  attr :loading,
+       :string,
+       values: ~w(lazy eager),
+       default: "lazy",
+       doc: ""
+
   attr :id, :string, required: false, doc: false
 
   @doc "> Primary avatar component."
@@ -73,7 +79,7 @@ defmodule Elemental.DataDisplay.Avatar do
       phx-hook="ElementalAvatar"
     >
       <div class={@class}>
-        <img :if={@src} id={@id <> "__img"} src={@src} alt={@alt} loading="lazy" />
+        <img :if={@src} id={@id <> "__img"} src={@src} alt={@alt} loading={@loading} />
         <span :if={@placeholder != []} id={@id <> "__placeholder"} hidden={not is_nil(@src)}>
           {@placeholder}
         </span>
@@ -82,14 +88,13 @@ defmodule Elemental.DataDisplay.Avatar do
     """
   end
 
-  attr :margin,
+  attr :overlap,
        :integer,
        default: 6,
        doc: """
-       The margin to use for spacing the avatars in the group.
+       The overlap of the avatars in the group.
 
-       This value will be used in it's negative form (e.g. if you put `6` the margin is
-       set to `-6`) and is used with the `space-x-{margin}` Tailwind class.
+       Passed as a negative space between the avatars in the group.
        """
 
   slot :inner_block,
@@ -99,7 +104,7 @@ defmodule Elemental.DataDisplay.Avatar do
   @doc "Group together a bunch of avatars."
   def avatar_group(assigns) do
     ~H"""
-    <div class={["avatar-group", "-space-x-#{@margin}"]}>
+    <div class={["avatar-group", "-space-x-#{@overlap}"]}>
       {render_slot(@inner_block)}
     </div>
     """

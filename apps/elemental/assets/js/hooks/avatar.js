@@ -6,9 +6,9 @@ function isImgOk(img) {
 }
 
 /**
- * Simple hook to handle on-error when loading images for the Avatar
- * component. Will hide the image and show the placeholder if
- * provided (or alt otherwise).
+ * Simple hook to handle on-error when loading images for the Avatar component.
+ * If an error happens this will hide the image and show the
+ * placeholder if provided.
  */
 export const ElementalAvatar = {
   mounted() {

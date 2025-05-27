@@ -1,4 +1,4 @@
-defmodule Elemental.Storybook.Components.Feedback.ToastGroup do
+defmodule Elemental.Storybook.Components.Feedback.Alert do
   use PhoenixStorybook.Story, :component
 
   def function, do: &Elemental.Feedback.Alert.alert/1
