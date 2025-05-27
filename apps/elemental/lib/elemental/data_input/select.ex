@@ -291,8 +291,7 @@ defmodule Elemental.DataInput.Select do
         />
       </:trigger>
 
-      <%!-- TODO: move to bg-base-100 once shadow is fixed in storybook --%>
-      <ul id={@id <> "__content"} class="menu z-1 w-52 p-2 bg-neutral-content rounded-box">
+      <ul id={@id <> "__content"} class="menu z-1 w-52 p-2 bg-base-100 shadow rounded-box">
         <.dropdown_search
           :if={@searchable and not @inline_search}
           component_id={@id}
@@ -438,8 +437,6 @@ defmodule Elemental.DataInput.Select do
 
   @doc false
   def component_classes(assigns) do
-    IO.inspect(assigns: assigns)
-
     [
       "select",
       @base_style,

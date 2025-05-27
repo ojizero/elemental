@@ -104,7 +104,7 @@ defmodule Elemental.Actions.Dropdown do
         >
           {render_slot(@trigger)}
         </summary>
-        <div id={@id <> "__dropdown_content"} class="dropdown-content shadow-sm">
+        <div id={@id <> "__dropdown_content"} class="dropdown-content">
           {render_slot(@inner_block)}
         </div>
       </details>
